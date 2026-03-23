@@ -1,0 +1,16 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "Udemy from beginner to pro",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "{POSTGRES USERNAME}",
+            "ConnectionParameters": {
+                "sslmode": "prefer",
+                "connect_timeout": 10
+            }
+        }
+    }
+}
