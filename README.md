@@ -18,7 +18,7 @@ Complete these steps **before** running `docker compose up`. The stack expects a
 Then start the stack:
 
 ```bash
-docker compose up
+docker-compose up
 ```
 
 PostgreSQL is exposed on port `5432`, and pgAdmin on `http://localhost:8080`.
