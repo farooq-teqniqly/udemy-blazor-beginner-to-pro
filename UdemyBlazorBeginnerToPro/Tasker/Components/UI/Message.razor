@@ -1,0 +1,8 @@
+﻿<div>@DisplayMessage</div>
+
+@code {
+    /// <summary>
+    /// The message to display.
+    /// </summary>
+    [Parameter, EditorRequired] public string DisplayMessage { get; set; } = string.Empty;
+}
