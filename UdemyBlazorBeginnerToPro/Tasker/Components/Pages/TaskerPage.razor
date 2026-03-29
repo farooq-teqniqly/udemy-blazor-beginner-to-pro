@@ -7,9 +7,13 @@
         </div>
         <div>
             <EditForm Model="taskerItem">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
                 <div class="d-flex flex-row gap-2">
                     <InputText class="form-control" placeholder="Enter a task" @bind-Value="taskerItem.Name"></InputText>
                     <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+                <div>
+                    <ValidationMessage For="() => taskerItem.Name"></ValidationMessage>
                 </div>
             </EditForm>
         </div>
