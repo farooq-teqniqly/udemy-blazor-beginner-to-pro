@@ -21,7 +21,7 @@
         <div class="vstack">
             @foreach (var ti in taskerItems)
             {
-                <div>@ti.Name</div>
+                <TaskerLine TaskerItem="ti" OnDelete="DeleteTask"></TaskerLine>
             }
         </div>
     </div>
@@ -35,6 +35,11 @@
     {
         var newTask = new TaskerItem { Name = taskerItem.Name };
         taskerItems.Add(newTask);
+    }
+
+    private void DeleteTask(TaskerItem ti)
+    {
+        taskerItems.Remove(ti);
     }
 
 }
