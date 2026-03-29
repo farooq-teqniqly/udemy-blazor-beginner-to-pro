@@ -1,12 +1,15 @@
 @page "/tasker"
 
+@inject ILogger<TaskerPage> Logger
+@inject LocalStorageService LocalStorageService
+
 <div class="d-flex align-items-center justify-content-center">
     <div class="task p-5">
         <div class="p2 text-center mb-3">
             <img src="/img/tasker_600.png" alt="Tasker" width="300" />
         </div>
         <div>
-            <EditForm Model="taskerItem" OnValidSubmit="AddTask">
+            <EditForm Model="taskerItem" OnValidSubmit="AddTaskAsync">
                 <DataAnnotationsValidator></DataAnnotationsValidator>
                 <div class="d-flex flex-row gap-2">
                     <InputText class="form-control" placeholder="Enter a task" @bind-Value="taskerItem.Name"></InputText>
@@ -21,30 +24,63 @@
         <div class="vstack">
             @foreach (var ti in taskerItems)
             {
-                <TaskerLine TaskerItem="ti" OnDelete="DeleteTask" OnTaskComplete="CompleteTask"></TaskerLine>
+                <TaskerLine TaskerItem="ti" OnDelete="DeleteTaskAsync" OnToggleComplete="ToggleTaskAsync"></TaskerLine>
             }
         </div>
     </div>
 </div>
 
 @code {
+    private const string StorageKey = "TASKER_LIST";
     private readonly TaskerItem taskerItem = new();
-    private readonly List<TaskerItem> taskerItems = [];
+    private List<TaskerItem> taskerItems = [];
 
-    private void AddTask()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var savedItems = await LocalStorageService.GetItemAsync<List<TaskerItem>>(StorageKey);
+
+        if (savedItems is null || savedItems.Count == 0)
+        {
+            Logger.LogDebug("No tasks to load.");
+            return;
+        }
+
+        taskerItems = savedItems;
+        StateHasChanged();
+        Logger.LogDebug("Successfully loaded {taskCount} tasks.", taskerItems.Count);
+    }
+
+    private async Task AddTaskAsync()
     {
         var newTask = new TaskerItem { Name = taskerItem.Name };
         taskerItems.Add(newTask);
+        Logger.LogDebug("Added task {taskName}", newTask.Name);
+        await PersistTasksAsync();
     }
 
-    private void DeleteTask(TaskerItem ti)
+    private async Task DeleteTaskAsync(TaskerItem ti)
     {
         taskerItems.Remove(ti);
+        Logger.LogDebug("Removed task {taskName}", ti.Name);
+        await PersistTasksAsync();
     }
 
-    private void CompleteTask(TaskerItem ti)
+    private async Task ToggleTaskAsync(TaskerItem ti)
     {
-        //TODO: Save task to local storage.
+        Logger.LogDebug("Task {taskName} completion toggled to {isComplete}", ti.Name, ti.IsComplete);
+        await PersistTasksAsync();
     }
+
+    private async Task PersistTasksAsync()
+    {
+        await LocalStorageService.SetItemAsync(StorageKey, taskerItems);
+        Logger.LogDebug("List successfully saved. Task count: {taskCount}", taskerItems.Count);
+    }
+
 
 }

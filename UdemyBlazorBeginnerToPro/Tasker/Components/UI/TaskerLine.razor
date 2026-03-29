@@ -1,6 +1,6 @@
 ﻿<div class="d-flex flex-row">
     <div>
-        <InputCheckbox @bind-Value="TaskerItem.IsComplete" @bind-Value:after="CompleteTaskAsync"></InputCheckbox>
+        <InputCheckbox @bind-Value="TaskerItem.IsComplete" @bind-Value:after="ToggleCompleteAsync"></InputCheckbox>
     </div>
     <div class="@GetCssClass()">
         @TaskerItem.Name
@@ -29,7 +29,7 @@
     /// Callback invoked after the task completion status is toggled.
     /// </summary>
     [Parameter]
-    public EventCallback<TaskerItem> OnTaskComplete { get; set; }
+    public EventCallback<TaskerItem> OnToggleComplete { get; set; }
 
     private async Task DeleteTaskAsync()
     {
@@ -41,9 +41,9 @@
         return $"px-2 flex-grow-1 {(TaskerItem.IsComplete ? "complete" : string.Empty)}";
     }
 
-    private async Task CompleteTaskAsync()
+    private async Task ToggleCompleteAsync()
     {
-        await OnTaskComplete.InvokeAsync(TaskerItem);
+        await OnToggleComplete.InvokeAsync(TaskerItem);
     }
 
 }
