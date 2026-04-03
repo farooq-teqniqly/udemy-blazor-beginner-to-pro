@@ -1,6 +1,6 @@
 :root {
-    --cf-title-font: 'Bebas Neue', sans-serif;
-    --cf-body-font: 'Montserrat', sans-serif;
+    --cf-title-font: 'Bebas Neue';
+    --cf-body-font: 'Montserrat';
     --cf-dark-color: #212121;
     --cf-light-color: #deeefb;
     --cf-font-size: 1.1rem;
