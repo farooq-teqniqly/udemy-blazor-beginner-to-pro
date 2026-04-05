@@ -1,0 +1,85 @@
+﻿@page "/themes"
+@inject IJSRuntime JS
+
+<PageTitle>Template Themes</PageTitle>
+
+<div class="mt-5">
+    <h1 class="text-center">Built in themes for your template</h1>
+    
+    <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center my-3">
+        @foreach (var theme in themes)
+        {
+            <div class="card" data-cf-theme="@theme">
+                <div class="card-body">
+                    <h3 class="card-title d-flex align-items-center">
+                        Theme:&nbsp;<span style="color: var(--cf-theme-core)">@theme</span>
+                        <button class="ms-auto btn btn-small btn-primary" @onclick="() => ChangeThemeAsync(theme)">Apply Theme</button>
+                    </h3>
+                    <h6 class="small fw-bold mt-3">Palette</h6>
+                    <div class="d-flex gap-0 align-items-center">
+                        @foreach (var weight in weights)
+                        {
+                            <div style="background-color: var(--cf-@theme-@weight); width: 16px; height: 16px"></div>
+                        }
+                    </div>
+                    <div class="my-3">
+                        <button class="btn btn-primary m2">Primary Button</button>
+                        <button class="btn btn-light m2">Light Button</button>
+                        <button class="btn btn-dark m2">Dark Button</button>
+                    </div>
+                    <div>
+                        Text with a <a href="#">clickable link</a> in the middle.
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private readonly List<string> themes =
+    [
+        "code-magic",
+        "blue",
+        "indigo",
+        "purple",
+        "pink",
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "teal",
+        "cyan",
+        "gray"
+    ];
+
+    private readonly List<string> weights =
+    [
+        "core",
+        "100",
+        "150",
+        "200",
+        "300",
+        "400",
+        "500",
+        "600",
+        "700",
+        "800",
+        "850",
+        "900"
+    ];
+
+    private async Task ChangeThemeAsync(string theme)
+    {
+        // setTheme is defined in index.html
+        ArgumentException.ThrowIfNullOrEmpty(theme);
+
+        if (!themes.Contains(theme))
+        {
+            throw new ArgumentException($"Invalid theme {theme}", nameof(theme));
+        }
+
+        await JS.InvokeVoidAsync("setTheme", theme);
+    }
+
+}
