@@ -1,0 +1,30 @@
+﻿@page "/reverse-string"
+
+<PageTitle>Reverse A String</PageTitle>
+<h3>Reverse a string</h3>
+
+<div class="vstack gap-3 col-8 col-md-6">
+    <InputText class="form-control" placeholder="Enter a string to reverse" @bind-Value="message"></InputText>
+    <div class="text-end">
+        <button class="btn btn-primary" @onclick="Reverse">Reverse Me</button>
+    </div>
+    <hr />
+
+    @if (!string.IsNullOrEmpty(reversedMessage))
+    {
+        <Message DisplayMessage="@displayMessage" Title="Results" CssClass="alert alert-danger"></Message>
+    }
+
+</div>
+
+@code {
+    private string message = "Reverse Me";
+    private string reversedMessage = string.Empty;
+    private string displayMessage = string.Empty;
+
+    private void Reverse()
+    {
+        reversedMessage = new string(message.Reverse().ToArray());
+        displayMessage = $"The reverse of {message} is {reversedMessage}";
+    }
+}

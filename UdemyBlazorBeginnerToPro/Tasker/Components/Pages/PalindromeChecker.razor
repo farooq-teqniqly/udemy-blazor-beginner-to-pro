@@ -1,0 +1,39 @@
+﻿@page "/palindrome-checker"
+
+<PageTitle>Palindrome Checker</PageTitle>
+<h3>Palindrome Checker</h3>
+
+<div class="vstack gap-3 col-8 col-md-6">
+    <InputText class="form-control" placeholder="Enter a string to check" @bind-Value="message"></InputText>
+    <div class="text-end">
+        <button class="btn btn-primary" @onclick="Check">Check</button>
+    </div>
+    <hr />
+
+    @if (!string.IsNullOrEmpty(displayMessage))
+    {
+        <Message DisplayMessage="@displayMessage" CssClass="@GetCssClass()"></Message>
+    }
+
+</div>
+
+@code {
+    private string message = "Am I a palindrome?";
+    private string reversedMessage = string.Empty;
+    private string displayMessage = string.Empty;
+    private bool isPalindrome;
+
+    private void Check()
+    {
+        var normalizedMessage = new string(message.Replace(" ", string.Empty));
+        reversedMessage = new string(normalizedMessage.Reverse().ToArray());
+
+        isPalindrome = reversedMessage.Equals(normalizedMessage, StringComparison.OrdinalIgnoreCase);
+        displayMessage = $"{message} {(isPalindrome ? "IS a" : "IS NOT a")} palindrome.";
+    }
+
+    private string GetCssClass()
+    {
+        return isPalindrome ? "alert alert-success" : "alert alert-danger";
+    }
+}

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BlazorLayout/BlazorLayout.csproj" Id="b7b357cb-a172-4bba-bd50-3f784952302d" />
+  <Project Path="Tasker/Tasker.csproj" Id="44477356-7737-42fe-95ff-ac882fe22ae9" />
+</Solution>
