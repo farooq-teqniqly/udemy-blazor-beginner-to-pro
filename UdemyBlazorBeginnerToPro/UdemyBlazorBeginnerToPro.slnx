@@ -1,5 +1,8 @@
 <Solution>
+  <Folder Name="/FizzbuzzProject/">
+    <Project Path="Fizzbuzz.Tests/Fizzbuzz.Tests.csproj" Id="0eccb6b0-4e4a-483f-a237-387782ebda12" />
+    <Project Path="Fizzbuzz/Fizzbuzz.csproj" Id="529f80e0-d4f8-43b2-ae2a-ace08ae80b3e" />
+  </Folder>
   <Project Path="BlazorLayout/BlazorLayout.csproj" Id="b7b357cb-a172-4bba-bd50-3f784952302d" />
-  <Project Path="Fizzbuzz/Fizzbuzz.csproj" Id="529f80e0-d4f8-43b2-ae2a-ace08ae80b3e" />
   <Project Path="Tasker/Tasker.csproj" Id="44477356-7737-42fe-95ff-ac882fe22ae9" />
 </Solution>

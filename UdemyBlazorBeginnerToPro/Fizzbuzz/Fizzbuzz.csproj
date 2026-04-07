@@ -16,4 +16,8 @@
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
+<ItemGroup>
+	<InternalsVisibleTo Include="Fizzbuzz.Tests" />
+</ItemGroup>
+
 </Project>
