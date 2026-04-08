@@ -1,9 +1,10 @@
 ﻿@page "/fizzbuzz"
 
 <div>
+    <img src="/images/fizzbuzzTitleLogo.png" class="img-fluid" alt="FizzBuzz logo"/>
     <h3>Solve the FizzBuzz Challenge</h3>
     <p>Enter your values, press the button, and see how the FizzBuzz logic works.</p>
-    
+
     <EditForm Model="model" OnValidSubmit="GetFizzbuzz">
         <DataAnnotationsValidator></DataAnnotationsValidator>
         <div class="border border-secondary-subtle rounded p-4">
@@ -19,7 +20,7 @@
                     <div id="fizzHelp" class="form-text text-muted">Replaces multiples of this number with "Fizz".</div>
                     <ValidationMessage For="@(() => model.FizzNumber)"></ValidationMessage>
                 </div>
-                
+
                 <div class="col mt-2">
                     <label for="buzzNumber" class="form-label">Buzz value</label>
                     <InputNumber id="buzzNumber"
@@ -31,7 +32,7 @@
                     <div id="buzzHelp" class="form-text text-muted">Replaces multiples of this number with "Buzz".</div>
                     <ValidationMessage For="@(() => model.BuzzNumber)"></ValidationMessage>
                 </div>
-                
+
                 <div class="col mt-2">
                     <label for="start" class="form-label">Start value</label>
                     <InputNumber id="start"
@@ -43,7 +44,7 @@
                     <div id="startHelp" class="form-text text-muted">The value at which processing starts.</div>
                     <ValidationMessage For="@(() => model.MinInclusive)"></ValidationMessage>
                 </div>
-                
+
                 <div class="col mt-2">
                     <label for="stop" class="form-label">Stop value</label>
                     <InputNumber id="stop"
@@ -68,7 +69,7 @@
     @if (results.Any())
     {
         <h4 class="mt-5 border-bottom">FizzBuzz Results</h4>
-        <div class="row row-cols-5">
+        <div class="row row-cols-5 mb-2">
             @foreach (var result in results)
             {
                 <FizzbuzzItem FizzbuzzValue="@result"></FizzbuzzItem>
