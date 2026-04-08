@@ -1,0 +1,12 @@
+﻿.Fizz {
+    background-color: var(--cf-theme-100);
+}
+
+.Buzz {
+    background-color: var(--cf-theme-200);
+}
+
+.FizzBuzz {
+    background-color: var(--cf-theme-300);
+}
+

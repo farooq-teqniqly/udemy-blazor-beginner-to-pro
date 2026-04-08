@@ -1,28 +1,26 @@
 ﻿@page "/fizzbuzz"
-@using System.Xml.Schema
 
 <div>
     <h3>Solve the FizzBuzz Challenge</h3>
     <p>Enter your values, press the button, and see how the FizzBuzz logic works.</p>
     
-    <EditForm Model="model">
+    <EditForm Model="model" OnValidSubmit="GetFizzbuzz">
         <DataAnnotationsValidator></DataAnnotationsValidator>
         <div class="border border-secondary-subtle rounded p-4">
-            <div class="row">
-                <div class="col">
+            <div class="row row-cols-1 row-cols-md-4 align-items-start">
+                <div class="col mt-2">
                     <label for="fizzNumber" class="form-label">Fizz value</label>
-                    <InputNumber
-                        id="fizzNumber"
-                        class="form-control"
-                        placeholder="Fizz value"
-                        aria-describedby="fizzHelp"
-                        aria-label="Fizz value"
-                        @bind-Value="model.FizzNumber"></InputNumber>
+                    <InputNumber id="fizzNumber"
+                                 class="form-control"
+                                 placeholder="Fizz value"
+                                 aria-describedby="fizzHelp"
+                                 aria-label="Fizz value"
+                                 @bind-Value="model.FizzNumber"></InputNumber>
                     <div id="fizzHelp" class="form-text text-muted">Replaces multiples of this number with "Fizz".</div>
                     <ValidationMessage For="@(() => model.FizzNumber)"></ValidationMessage>
                 </div>
                 
-                <div class="col">
+                <div class="col mt-2">
                     <label for="buzzNumber" class="form-label">Buzz value</label>
                     <InputNumber id="buzzNumber"
                                  class="form-control"
@@ -34,7 +32,7 @@
                     <ValidationMessage For="@(() => model.BuzzNumber)"></ValidationMessage>
                 </div>
                 
-                <div class="col">
+                <div class="col mt-2">
                     <label for="start" class="form-label">Start value</label>
                     <InputNumber id="start"
                                  class="form-control"
@@ -46,7 +44,7 @@
                     <ValidationMessage For="@(() => model.MinInclusive)"></ValidationMessage>
                 </div>
                 
-                <div class="col">
+                <div class="col mt-2">
                     <label for="stop" class="form-label">Stop value</label>
                     <InputNumber id="stop"
                                  class="form-control"
@@ -58,11 +56,38 @@
                     <ValidationMessage For="@(() => model.MaxInclusive)"></ValidationMessage>
                 </div>
             </div>
+            <div class="row">
+                <div class="col text-end mt-2">
+                    <button type="submit" class="btn btn-primary" aria-label="Generate Fizzbuzz results">Generate</button>
+                </div>
+            </div>
         </div>
     </EditForm>
+
+
+    @if (results.Any())
+    {
+        <h4 class="mt-5 border-bottom">FizzBuzz Results</h4>
+        <div class="row row-cols-5">
+            @foreach (var result in results)
+            {
+                <FizzbuzzItem FizzbuzzValue="@result"></FizzbuzzItem>
+            }
+        </div>
+    }
 </div>
 
 
 @code {
     private readonly FizzbuzzInputModel model = new();
+    private IEnumerable<string> results = [];
+
+    private void GetFizzbuzz()
+    {
+        results = FizzbuzzService.GetFizzbuzz(
+            model.MinInclusive,
+            model.MaxInclusive,
+            model.FizzNumber,
+            model.BuzzNumber);
+    }
 }
