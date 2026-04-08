@@ -4,31 +4,21 @@ namespace Fizzbuzz.Tests
 {
     public class FizzbuzzServiceTests
     {
-        [Fact]
-        public void GetFizzbuzz_Returns_Expected_List()
+        [Theory]
+        [ClassData(typeof(FizzbuzzTestData))]
+        public void GetFizzbuzz_Returns_Expected_List(
+            int minInclusive,
+            int maxInclusive,
+            int fizzNumber,
+            int buzzNumber,
+            string[] expectedResult
+        )
         {
-            var result = FizzbuzzService.GetFizzbuzz(1, 15, 3, 5).ToList();
+            var result = FizzbuzzService
+                .GetFizzbuzz(minInclusive, maxInclusive, fizzNumber, buzzNumber)
+                .ToList();
 
-            string[] expected =
-            [
-                "1",
-                "2",
-                "Fizz",
-                "4",
-                "Buzz",
-                "Fizz",
-                "7",
-                "8",
-                "Fizz",
-                "Buzz",
-                "11",
-                "Fizz",
-                "13",
-                "14",
-                "FizzBuzz",
-            ];
-
-            Assert.True(result.SequenceEqual(expected));
+            Assert.True(result.SequenceEqual(expectedResult));
         }
     }
 }

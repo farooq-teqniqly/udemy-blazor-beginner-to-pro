@@ -1,4 +1,6 @@
-﻿namespace Fizzbuzz.Services
+﻿using System.Text;
+
+namespace Fizzbuzz.Services
 {
     /// <summary>
     /// Provides static methods for generating FizzBuzz sequences.
@@ -89,23 +91,24 @@
         {
             var isFizz = i % fizzNumber == 0;
             var isBuzz = i % buzzNumber == 0;
+            var sb = new StringBuilder();
 
-            if (isFizz && isBuzz)
+            if (!isFizz && !isBuzz)
             {
-                return "FizzBuzz";
+                return i.ToString();
             }
 
             if (isFizz)
             {
-                return "Fizz";
+                sb.Append("Fizz");
             }
 
             if (isBuzz)
             {
-                return "Buzz";
+                sb.Append("Buzz");
             }
 
-            return i.ToString();
+            return sb.ToString();
         }
     }
 }
