@@ -1,7 +1,68 @@
 ﻿@page "/fizzbuzz"
+@using System.Xml.Schema
 
-<h3>Fizzbuzz Page</h3>
+<div>
+    <h3>Solve the FizzBuzz Challenge</h3>
+    <p>Enter your values, press the button, and see how the FizzBuzz logic works.</p>
+    
+    <EditForm Model="model">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <div class="border border-secondary-subtle rounded p-4">
+            <div class="row">
+                <div class="col">
+                    <label for="fizzNumber" class="form-label">Fizz value</label>
+                    <InputNumber
+                        id="fizzNumber"
+                        class="form-control"
+                        placeholder="Fizz value"
+                        aria-describedby="fizzHelp"
+                        aria-label="Fizz value"
+                        @bind-Value="model.FizzNumber"></InputNumber>
+                    <div id="fizzHelp" class="form-text text-muted">Replaces multiples of this number with "Fizz".</div>
+                    <ValidationMessage For="@(() => model.FizzNumber)"></ValidationMessage>
+                </div>
+                
+                <div class="col">
+                    <label for="buzzNumber" class="form-label">Buzz value</label>
+                    <InputNumber id="buzzNumber"
+                                 class="form-control"
+                                 placeholder="Buzz value"
+                                 aria-describedby="buzzHelp"
+                                 aria-label="Buzz value"
+                                 @bind-Value="model.BuzzNumber"></InputNumber>
+                    <div id="buzzHelp" class="form-text text-muted">Replaces multiples of this number with "Buzz".</div>
+                    <ValidationMessage For="@(() => model.BuzzNumber)"></ValidationMessage>
+                </div>
+                
+                <div class="col">
+                    <label for="start" class="form-label">Start value</label>
+                    <InputNumber id="start"
+                                 class="form-control"
+                                 placeholder="Start value"
+                                 aria-describedby="startHelp"
+                                 aria-label="Start value"
+                                 @bind-Value="model.MinInclusive"></InputNumber>
+                    <div id="startHelp" class="form-text text-muted">The value at which processing starts.</div>
+                    <ValidationMessage For="@(() => model.MinInclusive)"></ValidationMessage>
+                </div>
+                
+                <div class="col">
+                    <label for="stop" class="form-label">Stop value</label>
+                    <InputNumber id="stop"
+                                 class="form-control"
+                                 placeholder="Stop value"
+                                 aria-describedby="stopHelp"
+                                 aria-label="Stop value"
+                                 @bind-Value="model.MaxInclusive"></InputNumber>
+                    <div id="stopHelp" class="form-text text-muted">The value at which processing stops.</div>
+                    <ValidationMessage For="@(() => model.MaxInclusive)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
 
 @code {
-
+    private readonly FizzbuzzInputModel model = new();
 }

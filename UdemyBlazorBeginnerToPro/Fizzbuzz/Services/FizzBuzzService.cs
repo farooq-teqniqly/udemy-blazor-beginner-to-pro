@@ -8,6 +8,11 @@ namespace Fizzbuzz.Services
     /// </summary>
     internal static class FizzbuzzService
     {
+        internal const int MinInclusiveMinValue = 1;
+        internal const int MaxInclusiveMaxValue = 100;
+        internal const int FizzNumberMinValue = 1;
+        internal const int BuzzNumberMinValue = 1;
+
         /// <summary>
         /// Generates a sequence of FizzBuzz values for numbers in the specified range.
         /// Numbers divisible by fizzNumber return "Fizz", numbers divisible by buzzNumber return "Buzz",
@@ -47,19 +52,19 @@ namespace Fizzbuzz.Services
             int buzzNumber
         )
         {
-            if (minInclusive < 1)
+            if (minInclusive < MinInclusiveMinValue)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(minInclusive),
-                    "Value must be greater than or equal to 1."
+                    $"Value must be greater than or equal to {MinInclusiveMinValue}."
                 );
             }
 
-            if (maxInclusive > 100)
+            if (maxInclusive > MaxInclusiveMaxValue)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(maxInclusive),
-                    "Value must be less than or equal to 100."
+                    $"Value must be less than or equal to {MaxInclusiveMaxValue}."
                 );
             }
 
@@ -70,19 +75,19 @@ namespace Fizzbuzz.Services
                 );
             }
 
-            if (fizzNumber < 0)
+            if (fizzNumber < FizzNumberMinValue)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(fizzNumber),
-                    "fizzNumber must be non-negative."
+                    $"fizzNumber must be greater than or equal to {FizzNumberMinValue}."
                 );
             }
 
-            if (buzzNumber < 0)
+            if (buzzNumber < BuzzNumberMinValue)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(buzzNumber),
-                    "buzzNumber must be non-negative."
+                    $"buzzNumber must be greater than or equal to {BuzzNumberMinValue}."
                 );
             }
         }
