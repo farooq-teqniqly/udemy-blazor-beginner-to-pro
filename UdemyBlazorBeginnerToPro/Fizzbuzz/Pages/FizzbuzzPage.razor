@@ -5,8 +5,9 @@
     <h3>Solve the FizzBuzz Challenge</h3>
     <p>Enter your values, press the button, and see how the FizzBuzz logic works.</p>
 
-    <EditForm Model="model" OnValidSubmit="GetFizzbuzz">
+    <EditForm EditContext="editContext" OnValidSubmit="GetFizzbuzz">
         <DataAnnotationsValidator></DataAnnotationsValidator>
+        <FizzbuzzInputModelValidator></FizzbuzzInputModelValidator>
         <div class="border border-secondary-subtle rounded p-4">
             <div class="row row-cols-1 row-cols-md-4 align-items-start">
                 <div class="col mt-2">
@@ -82,6 +83,12 @@
 @code {
     private readonly FizzbuzzInputModel model = new();
     private IEnumerable<string> results = [];
+    private EditContext editContext = null!;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(model);
+    }
 
     private void GetFizzbuzz()
     {
