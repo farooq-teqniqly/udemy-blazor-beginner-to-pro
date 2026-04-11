@@ -1,4 +1,5 @@
 ﻿@page "/loan-shark"
+@inject LoanCalculator LoanCalculator
 
 <div>
     <h1 class="mb-2">LoanShark Calculator</h1>
@@ -15,7 +16,7 @@
     </p>
     <div class="row">
         <div class="col-12 col-md-6 loan-form p-3">
-            <EditForm EditContext="_editContext">
+            <EditForm EditContext="_editContext" OnValidSubmit="CalculateLoan">
                 <DataAnnotationsValidator></DataAnnotationsValidator>
                 <div class="row gy-2">
                     <div class="col-12">
@@ -90,6 +91,16 @@
         loan.Amount = 25000;
         loan.TermMonths = 60;
         loan.Rate = 5.0;
+    }
+
+    private void CalculateLoan()
+    {
+        LoanCalculator.CalculateLoan(_inputModel);
+        _viewModel.MonthlyPayment = Math.Round(LoanCalculator.MonthlyPayment, 2);
+        _viewModel.TotalInterest = Math.Round(LoanCalculator.TotalInterest, 2);
+        _viewModel.TotalCost = Math.Round(LoanCalculator.TotalCost, 2);
+        _viewModel.Payments = new List<PaymentViewModel>(_inputModel.TermMonths);
+        _viewModel.TotalPrincipal = _inputModel.Amount;
     }
 
 }

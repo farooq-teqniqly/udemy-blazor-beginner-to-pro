@@ -4,6 +4,7 @@
     <Project Path="Fizzbuzz/Fizzbuzz.csproj" Id="529f80e0-d4f8-43b2-ae2a-ace08ae80b3e" />
   </Folder>
   <Folder Name="/LoanSharkProject/">
+    <Project Path="LoanShark.Tests/LoanShark.Tests.csproj" Id="620ee3ba-5192-4960-9460-cd419fb275f2" />
     <Project Path="LoanShark/LoanShark.csproj" Id="30b9417c-1299-4951-8d1f-7e5fc4de9e4c" />
   </Folder>
   <Project Path="BlazorLayout/BlazorLayout.csproj" Id="b7b357cb-a172-4bba-bd50-3f784952302d" />

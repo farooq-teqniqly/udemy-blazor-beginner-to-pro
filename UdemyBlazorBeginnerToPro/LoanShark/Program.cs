@@ -1,3 +1,4 @@
+using LoanShark.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -15,6 +16,8 @@ namespace LoanShark
             {
                 BaseAddress = new Uri(builder.HostEnvironment.BaseAddress),
             });
+
+            builder.Services.AddSingleton<LoanCalculator>();
 
             await builder.Build().RunAsync();
         }
