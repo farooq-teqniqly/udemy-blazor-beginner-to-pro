@@ -12,8 +12,8 @@ namespace LoanShark.Models
         [Range(0, 100, ErrorMessage = "Interest rate must be between 0% and 100%.")]
         public double Rate { get; set; }
 
-        [Required(ErrorMessage = "Loan term in years is required.")]
-        [Range(1, 100, ErrorMessage = "Loan term must be between 1 and 100 years.")]
-        public int TermYears { get; set; }
+        [Required(ErrorMessage = "Loan term in months is required.")]
+        [Range(1, 1200, ErrorMessage = "Loan term must be between 1 and 1200 months.")]
+        public int TermMonths { get; set; }
     }
 }
