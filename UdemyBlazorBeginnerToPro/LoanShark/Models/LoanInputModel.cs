@@ -9,7 +9,7 @@ namespace LoanShark.Models
         public double Amount { get; set; }
 
         [Required(ErrorMessage = "Interest rate is required.")]
-        [Range(0, 100, ErrorMessage = "Interest rate must be between 0% and 100%.")]
+        [Range(0.0, 100.0, ErrorMessage = "Interest rate must be between 0% and 100%.")]
         public double Rate { get; set; }
 
         [Required(ErrorMessage = "Loan term in months is required.")]

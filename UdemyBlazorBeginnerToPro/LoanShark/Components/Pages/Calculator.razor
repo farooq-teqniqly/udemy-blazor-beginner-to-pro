@@ -1,9 +1,95 @@
 ﻿@page "/loan-shark"
 
 <div>
-    <h3>LoanShark Calculator</h3>
+    <h1 class="mb-2">LoanShark Calculator</h1>
+    <p>
+        If you’ve been thinking about borrowing money and are curious to see what payments would look like before you apply,
+        a loan calculator can be an ideal tool to help you figure this out.
+    </p>
+    <p>
+        Loan Shark’s loan calculator was designed to help borrowers calculate amortized loans. These are mortgages,
+        auto loans, student loans and other types of personal loans that are paid off in regular installments over time,
+        with fixed payments covering both the principal amount and interest. Our calculator shows you the total cost of a loan,
+        expressed as the annual percentage rate, or APR. Enter the loan amount, term and interest rate in the fields below and
+        click calculate to see your personalized results.
+    </p>
+    <div class="row">
+        <div class="col-12 col-md-6 loan-form p-3">
+            <EditForm EditContext="_editContext">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <div class="row gy-2">
+                    <div class="col-12">
+                        <label for="loan-amount" class="form-label">Loan amount:</label>
+                        <InputNumber id="loan-amount" class="form-control" @bind-Value="_inputModel.Amount" min="0" step="1000"></InputNumber>
+                        <ValidationMessage For="@(() => _inputModel.Amount)"></ValidationMessage>
+                    </div>
+                    <div class="col-12">
+                        <label for="loan-term" class="form-label">Loan term (months):</label>
+                        <InputNumber id="loan-term" class="form-control" @bind-Value="_inputModel.TermMonths" min="1" step="1"></InputNumber>
+                        <ValidationMessage For="@(() => _inputModel.TermMonths)"></ValidationMessage>
+                    </div>
+                    <div class="col-12">
+                        <label for="loan-rate" class="form-label">Loan rate (%):</label>
+                        <InputNumber id="loan-rate" class="form-control" @bind-Value="_inputModel.Rate" min="0" max="100" step="0.1"></InputNumber>
+                        <ValidationMessage For="@(() => _inputModel.Rate)"></ValidationMessage>
+                    </div>
+                    <div class="text-end mt-2">
+                        <button type="submit" class="btn btn-primary">Calculate</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+        <div class="col-12 col-md-6 d-flex flex-column justify-content-between px-4 mt-4 mt-md-0">
+            <div>
+                <div class="payment-title">
+                    <p>Your Monthly Payment</p>
+                </div>
+                <div class="display-1 payment">@_viewModel.MonthlyPayment.ToString("C")</div>
+                <div class="row border border-1 g-0 p-3">
+                    <div class="col-6">
+                        <label class="text-start">Total principal</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        @_viewModel.TotalPrincipal.ToString("C")
+                    </div>
+                    <div class="col-6">
+                        <label class="text-start">Total interest</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        @_viewModel.TotalInterest.ToString("C")
+                    </div>
+                    <div class="col-6">
+                        <label class="text-start">Total cost</label>
+                    </div>
+                    <div class="col-6 text-end total-cost">
+                        @_viewModel.TotalCost.ToString("C")
+                    </div>
+                </div>
+                <div class="text-end mt-2">
+                    <button class="btn btn-primary">Show payment schedule</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
+    private readonly LoanInputModel _inputModel = new();
+    private readonly LoanViewModel _viewModel = new();
+
+    private EditContext? _editContext;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_inputModel);
+        SetLoanDefaults(_inputModel);
+    }
+
+    private static void SetLoanDefaults(LoanInputModel loan)
+    {
+        loan.Amount = 25000;
+        loan.TermMonths = 60;
+        loan.Rate = 5.0;
+    }
 
 }

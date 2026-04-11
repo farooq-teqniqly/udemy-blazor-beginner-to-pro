@@ -1,0 +1,26 @@
+﻿.loan-form {
+    background-color: var(--bs-tertiary-bg);
+    border: solid 1px var(--bs-secondary-bg);
+}
+
+.loan-form input {
+    width: 100%;
+    padding: 0.5rem;
+}
+
+.payment-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-style: italic;
+}
+
+.payment {
+    text-align: center;
+    font-weight: bold;
+    color: #2b404f;
+    font-family: "Bebas Neue", sans-serif;
+}
+
+.total-cost {
+    font-weight: bold;
+}
