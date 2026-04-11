@@ -17,7 +17,7 @@ namespace LoanShark
                 BaseAddress = new Uri(builder.HostEnvironment.BaseAddress),
             });
 
-            builder.Services.AddSingleton<LoanCalculator>();
+            builder.Services.AddSingleton<LoanService>();
 
             await builder.Build().RunAsync();
         }

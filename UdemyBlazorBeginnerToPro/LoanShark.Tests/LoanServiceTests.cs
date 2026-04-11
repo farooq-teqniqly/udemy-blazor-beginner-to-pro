@@ -3,7 +3,7 @@ using LoanShark.Services;
 
 namespace LoanShark.Tests
 {
-    public class LoanCalculatorTests
+    public class LoanServiceTests
     {
         [Theory]
         [InlineData(25000, 5, 60, 471.78, 3306.85, 28306.85)]
@@ -23,7 +23,7 @@ namespace LoanShark.Tests
                 TermMonths = termMonths,
             };
 
-            var calculator = new LoanCalculator();
+            var calculator = new LoanService();
             calculator.CalculateLoan(model);
 
             Assert.Equal(expectedPayment, Math.Round(calculator.MonthlyPayment, 2));
