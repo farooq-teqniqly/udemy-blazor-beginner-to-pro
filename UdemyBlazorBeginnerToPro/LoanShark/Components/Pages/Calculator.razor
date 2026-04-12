@@ -67,7 +67,7 @@
                     </div>
                 </div>
                 <div class="text-end mt-2">
-                    <button class="btn btn-primary">Show payment schedule</button>
+                    <button class="btn btn-primary" @onclick="ShowPaymentSchedule">@(_showPaymentSchedule ? "Hide" : "Show") payment schedule</button>
                 </div>
             </div>
         </div>
@@ -77,6 +77,7 @@
 @code {
     private readonly LoanInputModel _inputModel = new();
     private readonly LoanViewModel _viewModel = new();
+    private bool _showPaymentSchedule = false;
 
     private EditContext? _editContext;
 
@@ -99,8 +100,14 @@
         _viewModel.MonthlyPayment = Math.Round(LoanService.MonthlyPayment, 2);
         _viewModel.TotalInterest = Math.Round(LoanService.TotalInterest, 2);
         _viewModel.TotalCost = Math.Round(LoanService.TotalCost, 2);
-        _viewModel.Payments = new List<PaymentViewModel>(_inputModel.TermMonths);
+        _viewModel.Payments = LoanService.PaymentScheduleViewModel;
         _viewModel.TotalPrincipal = _inputModel.Amount;
+    }
+
+    private void ShowPaymentSchedule()
+    {
+        _showPaymentSchedule = !_showPaymentSchedule;
+        StateHasChanged();
     }
 
 }

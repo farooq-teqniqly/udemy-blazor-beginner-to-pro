@@ -1,6 +1,6 @@
 ﻿namespace LoanShark.Models;
 
-public sealed class PaymentViewModel
+public sealed class PaymentScheduleRowViewModel
 {
     public double Balance { get; set; }
     public double Interest { get; set; }
