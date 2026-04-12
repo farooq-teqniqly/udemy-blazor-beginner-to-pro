@@ -72,12 +72,21 @@
             </div>
         </div>
     </div>
+    @if (_showPaymentSchedule)
+    {
+        <div class="row mt-3">
+            <div class="col-12">
+                Payment schedule table
+            </div>
+        </div>
+            
+    }
 </div>
 
 @code {
     private readonly LoanInputModel _inputModel = new();
     private readonly LoanViewModel _viewModel = new();
-    private bool _showPaymentSchedule = false;
+    private bool _showPaymentSchedule;
 
     private EditContext? _editContext;
 
@@ -97,9 +106,9 @@
     private void CalculateLoan()
     {
         LoanService.CalculateLoan(_inputModel);
-        _viewModel.MonthlyPayment = Math.Round(LoanService.MonthlyPayment, 2);
-        _viewModel.TotalInterest = Math.Round(LoanService.TotalInterest, 2);
-        _viewModel.TotalCost = Math.Round(LoanService.TotalCost, 2);
+        _viewModel.MonthlyPayment = LoanService.MonthlyPayment;
+        _viewModel.TotalInterest = LoanService.TotalInterest;
+        _viewModel.TotalCost = LoanService.TotalCost;
         _viewModel.Payments = LoanService.PaymentScheduleViewModel;
         _viewModel.TotalPrincipal = _inputModel.Amount;
     }
