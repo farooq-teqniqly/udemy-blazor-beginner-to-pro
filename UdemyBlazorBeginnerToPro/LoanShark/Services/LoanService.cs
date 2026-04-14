@@ -21,10 +21,17 @@ namespace LoanShark.Services
 
         private void CalculateMonthlyPayment(LoanInputModel model)
         {
-            MonthlyPayment =
-                model.Amount
-                * (model.Rate / 1200)
-                / (1 - Math.Pow(1 + model.Rate / 1200, -model.TermMonths));
+            if (model.Rate == 0)
+            {
+                MonthlyPayment = model.Amount / model.TermMonths;
+            }
+            else
+            {
+                MonthlyPayment =
+                    model.Amount
+                    * (model.Rate / 1200)
+                    / (1 - Math.Pow(1 + model.Rate / 1200, -model.TermMonths));
+            }
         }
 
         private void CalculatePaymentSchedule(LoanInputModel model)

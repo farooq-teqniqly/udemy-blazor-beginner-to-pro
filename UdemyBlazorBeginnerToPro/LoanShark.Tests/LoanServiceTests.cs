@@ -7,6 +7,7 @@ namespace LoanShark.Tests
     {
         [Theory]
         [InlineData(25000, 5, 60, 471.78, 3306.85, 28306.85)]
+        [InlineData(1000, 0, 10, 100, 0, 1000)]
         public void CalculateLoan_Calculates_Monthly_Payments_And_Totals(
             double amount,
             double rate,
