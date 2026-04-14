@@ -66,24 +66,17 @@
                         @_viewModel.TotalCost.ToString("C")
                     </div>
                 </div>
-                <div class="text-end mt-2">
-                    <button class="btn btn-primary" @onclick="ShowPaymentSchedule">@(_showPaymentSchedule ? "Hide" : "Show") payment schedule</button>
-                </div>
             </div>
         </div>
     </div>
-    @if (_showPaymentSchedule)
-    {
-        <div class="col-12">
-            <PaymentSchedule PaymentScheduleRows="_viewModel.Payments"></PaymentSchedule>
-        </div>
-    }
+    <div class="col-12">
+        <PaymentSchedule PaymentScheduleRows="_viewModel.Payments"></PaymentSchedule>
+    </div>
 </div>
 
 @code {
     private readonly LoanInputModel _inputModel = new();
     private readonly LoanViewModel _viewModel = new();
-    private bool _showPaymentSchedule;
 
     private EditContext? _editContext;
 
@@ -91,6 +84,7 @@
     {
         _editContext = new EditContext(_inputModel);
         SetLoanDefaults(_inputModel);
+        CalculateLoan();
     }
 
     private static void SetLoanDefaults(LoanInputModel loan)
@@ -102,18 +96,13 @@
 
     private void CalculateLoan()
     {
+        _viewModel.Payments.Clear();
         LoanService.CalculateLoan(_inputModel);
         _viewModel.MonthlyPayment = LoanService.MonthlyPayment;
         _viewModel.TotalInterest = LoanService.TotalInterest;
         _viewModel.TotalCost = LoanService.TotalCost;
         _viewModel.Payments = LoanService.PaymentScheduleViewModel;
         _viewModel.TotalPrincipal = _inputModel.Amount;
-    }
-
-    private void ShowPaymentSchedule()
-    {
-        _showPaymentSchedule = !_showPaymentSchedule;
         StateHasChanged();
     }
-
 }
