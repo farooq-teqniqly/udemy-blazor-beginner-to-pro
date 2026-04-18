@@ -4,6 +4,9 @@
     --cf-dark-color: #212121;
     --cf-light-color: #deeefb;
     --cf-font-size: 1.1rem;
+    --cf-button-home-bg: hsl(60, 100%, 66%);
+    --cf-button-home-hover: hsl(60, 100%, 46%);
+    --cf-button-home-active: hsl(60, 100%, 46%);
 }
 
 html, body {
@@ -20,6 +23,20 @@ h1, h2, h3, h4, h5, h6 {
 .h1, .h2, .h3, .h4, .h5, .h6 {
     font-family: var(--cf-title-font);
 }
+
+.btn-home {
+    --bs-btn-bg: var(--cf-button-home-bg);
+    --bs-btn-border-color: var(--cf-button-home-bg);
+    --bs-btn-hover-bg: var(--cf-button-home-hover);
+    --bs-btn-hover-border-color: var(--cf-button-home-hover);
+    --bs-btn-active-bg: var(--cf-button-home-active);
+    --bs-btn-active-border-color: var(--cf-button-home-active);
+    --bs-btn-disabled-bg: var(--cf-button-home-bg);
+    --bs-btn-disabled-border-color: var(--cf-button-home-bg);
+    --bs-btn-hover-color: var(--cf-dark-color);
+    color: var(--cf-dark-color);
+}
+
 
 #app {
     height: 100%;

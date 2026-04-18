@@ -19,7 +19,7 @@
 
 /* Dark text for readability on the light landing background */
 .homeCopy {
-    color: var(--cf-dark-color);
+    color: var(--cf-light-color);
 }
 
 .devicons {
