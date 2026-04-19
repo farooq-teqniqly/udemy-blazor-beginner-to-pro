@@ -8,6 +8,7 @@
     <Project Path="LoanShark/LoanShark.csproj" Id="30b9417c-1299-4951-8d1f-7e5fc4de9e4c" />
   </Folder>
   <Folder Name="/NowPlayingProject/">
+    <Project Path="NowPlayingApp.Tests/NowPlayingApp.Tests.csproj" Id="f902aa12-76ab-4c25-9002-4561d3689310" />
     <Project Path="NowPlayingApp/NowPlayingApp.csproj" Id="0e9a5b41-ed5e-44bc-a690-920d5b3865a5" />
   </Folder>
   <Project Path="BlazorLayout/BlazorLayout.csproj" Id="b7b357cb-a172-4bba-bd50-3f784952302d" />
