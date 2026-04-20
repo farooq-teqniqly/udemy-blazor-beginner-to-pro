@@ -1,0 +1,94 @@
+schema: spec-driven
+
+# Project context shown to AI when creating artifacts.
+context: |
+  Project: NowPlayingApp
+    A Blazor WebAssembly single-page app that lists movies currently playing
+    in theaters. Data is retrieved from The Movie Database (TMDB) public API.
+    The repository is coursework from a Udemy "Blazor: Beginner to Pro" course;
+    only the NowPlayingApp and NowPlayingApp.Tests projects are in scope for
+    OpenSpec artifacts. Ignore other sibling projects in the repo.
+
+  Tech stack:
+    - .NET 10 (net10.0), C# with nullable reference types and implicit usings enabled
+    - Blazor WebAssembly (Microsoft.AspNetCore.Components.WebAssembly 10.0.x)
+    - Microsoft.Extensions.Http + Microsoft.Extensions.Http.Resilience
+      (AddStandardResilienceHandler on the typed HttpClient)
+    - Microsoft.Extensions.Options for strongly typed configuration
+    - Bootstrap 5.3, Bootstrap Icons, Devicon, Google Fonts (Bebas Neue, Montserrat)
+      loaded via CDN from wwwroot/index.html
+    - Custom CSS in wwwroot/css (app.css, themes.css) plus component-scoped
+      .razor.css files
+    - Testing: xUnit 2.9, NSubstitute 5.3, coverlet.collector, Microsoft.NET.Test.Sdk
+    - HTTP collection tests authored in Bruno (NowPlayingApp/BrunoTests)
+    - Secrets: dotnet user-secrets (UserSecretsId set in the csproj) for the
+      TMDB bearer token; public endpoints live in wwwroot/appsettings.json
+
+  Architecture and conventions:
+    - Top-level folders: Components/Pages, Components/Layout, Components/UI,
+      Models, Services, wwwroot
+    - Typed HttpClient pattern: TMDBClient is registered with AddHttpClient
+      and configured from TMDBClientSettings (Options pattern). Settings are
+      validated at client-factory time via ArgumentException.ThrowIfNullOrEmpty.
+    - Authorization header uses Bearer token from TMDBClientSettings.TMDBAccessKey.
+    - Models are plain DTOs in the Models namespace. JSON mapping uses
+      System.Text.Json with [JsonPropertyName("snake_case")] attributes and
+      sensible defaults (string.Empty, empty arrays) so responses deserialize
+      cleanly under nullable reference types.
+    - Pages inject services with @inject and use @code blocks for component
+      state. Async work uses CancellationTokenSource owned by the component
+      and is cancelled/disposed in Dispose. OperationCanceledException and
+      HttpRequestException are caught and logged via ILogger<T>.
+    - Prefer sealed classes for services and settings (for example TMDBClient,
+      TMDBClientSettings).
+    - Guard clauses use ArgumentNullException.ThrowIfNull and
+      ArgumentException.ThrowIfNullOrEmpty at the top of constructors and
+      public methods.
+    - Private fields use _camelCase. Types, methods, and public members use
+      PascalCase. Async methods accept an optional CancellationToken with a
+      default value.
+    - Namespaces: block-scoped in the app project, file-scoped in the tests
+      project. Match the folder structure.
+    - _Imports.razor centralizes common using directives for all components.
+
+  Testing conventions:
+    - xUnit with [Fact] (and [Theory] when parameterized).
+    - NSubstitute for mocking IOptions<T> and other dependencies.
+    - Test class name mirrors the system under test with a Tests suffix
+      (for example TMDBClientTests).
+    - Test method naming uses underscores:
+      MethodUnderTest_When_Scenario_Returns_Expected (or _Throws when the
+      expectation is an exception).
+    - Arrange/Act/Assert without explicit comment banners; name the SUT "sut".
+    - Each public behavior should have at least one happy-path test and one
+      failure-path test (null input, missing configuration, non-success HTTP).
+
+  Documentation style (applies to all OpenSpec artifacts):
+    - US English spelling and grammar.
+    - No emojis. Use regular bullets (-).
+    - No em dashes. Use regular hyphens.
+    - Refer to files, types, and members with backticks.
+
+# Per-artifact rules
+rules:
+  proposal:
+    - State the user-visible outcome in the first paragraph.
+    - Include a "Non-goals" section that explicitly lists other projects in
+      the repository (outside NowPlayingApp and NowPlayingApp.Tests) as out
+      of scope.
+    - Call out any new TMDB endpoint, configuration key, or secret required.
+  design:
+    - Describe where new code lives using the existing folders
+      (Components/Pages, Components/Layout, Components/UI, Models, Services).
+    - Specify DI registration changes in Program.cs when adding services or
+      typed HttpClients, and note whether AddStandardResilienceHandler applies.
+    - Note any new TMDBClientSettings properties and whether they belong in
+      wwwroot/appsettings.json or user-secrets.
+  tasks:
+    - Break tasks into chunks of at most 2 hours of focused work.
+    - Pair every Services or Models change with a matching task in
+      NowPlayingApp.Tests using xUnit and NSubstitute.
+    - Include a task to update _Imports.razor when a new component namespace
+      is introduced.
+    - Include a task to add or update a Bruno request under
+      NowPlayingApp/BrunoTests/TMDB when a new TMDB endpoint is consumed.
