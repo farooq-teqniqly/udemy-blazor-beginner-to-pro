@@ -1,0 +1,29 @@
+﻿@inject TMDBClient TMDBClient
+
+<div class="card h-100 movie-card">
+    <img src="@GetPosterUri(Movie.PosterPath)" alt="Movie poster" class="card-img-top" />
+    <div class="card-body border border-top">
+        <div class="card-title fw-bold lh-1">@Movie.Title</div>
+        <div class="card-text lh-1 fst-italic">Release date: @GetFormattedDate(Movie.ReleaseDate)</div>
+    </div>
+    <div class="card-footer d-flex justify-content-between movie-card-footer">
+        <button class="btn btn-outline-primary">Add favorite</button>
+        <a href="moviedetail" class="btn btn-primary">More info</a>
+    </div>
+</div>
+@code {
+
+    [Parameter, EditorRequired]
+    public MovieResponse Movie { get; set; }
+
+    private string GetFormattedDate(string rawDate)
+    {
+        return DateTime.TryParse(rawDate, out var parsedDate) ? parsedDate.ToString("MMMM dd, yyyy") : "Unknown";
+    }
+
+    private string GetPosterUri(string posterPath)
+    {
+        return TMDBClient.GetPosterUri(posterPath).ToString();
+    }
+
+}

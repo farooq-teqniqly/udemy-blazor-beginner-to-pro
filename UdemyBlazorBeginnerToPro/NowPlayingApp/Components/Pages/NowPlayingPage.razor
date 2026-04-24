@@ -1,0 +1,72 @@
+﻿@page "/now-playing"
+@inject TMDBClient TMDBClient
+@inject ILogger<NowPlayingPage> Logger
+
+<PageTitle>Now Playing</PageTitle>
+<div>
+    <h1>
+        <i class="bi bi-film text-primary"></i>
+        Now Playing
+    </h1>
+    <p class="lead italic">Movies that are now playing in theaters.</p>
+    <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
+        @if (_nowPlayingMovies is null)
+        {
+            <div class="d-flex justify-content-center align-items-center">
+                @if (_isLoading)
+                {
+                    <h2>Loading Now Playing movies...</h2>
+                }
+                else
+                {
+                    <h2 class="text-muted">Failed to load Now Playing movies.</h2>
+                }
+            </div>
+        }
+        else
+        {
+            @foreach (var movie in _nowPlayingMovies.Results)
+            {
+                <div class="col">
+                    <MovieCard Movie="movie"></MovieCard>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private CancellationTokenSource? _cancellationTokenSource;
+    private MovieListResponse? _nowPlayingMovies;
+    private bool _isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        _isLoading = true;
+
+        try
+        {
+            _nowPlayingMovies = await TMDBClient.GetNowPlayingMovies(_cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.LogDebug($"{nameof(TMDBClient.GetNowPlayingMovies)} request was cancelled.");
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Logger.LogError(httpRequestException, $"{nameof(TMDBClient.GetNowPlayingMovies)} - an error occurred.");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+    }
+}

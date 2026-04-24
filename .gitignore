@@ -420,3 +420,6 @@ FodyWeavers.xsd
 # Docker secrets (if you are using Docker secrets, you should not check them into source control)
 secrets/
 .env
+
+# Configuration files
+appsettings.Development.json
