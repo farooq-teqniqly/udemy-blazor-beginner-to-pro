@@ -7,6 +7,7 @@ namespace NowPlayingApp.Services
 {
     public sealed class TMDBClient
     {
+        private const string DateFormat = "yyyy-MM-dd";
         private readonly HttpClient _http;
         private readonly TMDBClientSettings _settings;
 
@@ -20,11 +21,19 @@ namespace NowPlayingApp.Services
         }
 
         public async Task<MovieListResponse> GetNowPlayingMovies(
+            int inLastDays = 14,
             CancellationToken cancellationToken = default
         )
         {
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(inLastDays, 0);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(inLastDays, 30);
+
+            var now = DateTime.UtcNow;
+            var releaseDateGte = now.AddDays(-inLastDays).ToString(DateFormat);
+            var releaseDateLte = now.ToString(DateFormat);
+
             var requestUri =
-                "movie/now_playing?language=en-US&page=1&&sort_by=primary_release_date.desc&release_date.gte=2026-04-01&with_original_language=en";
+                $"discover/movie?language=en-US&page=1&sort_by=popularity.desc&primary_release_date.gte={releaseDateGte}&primary_release_date.lte={releaseDateLte}&with_original_language=en";
 
             var response = await _http.GetAsync(requestUri, cancellationToken);
             response.EnsureSuccessStatusCode();

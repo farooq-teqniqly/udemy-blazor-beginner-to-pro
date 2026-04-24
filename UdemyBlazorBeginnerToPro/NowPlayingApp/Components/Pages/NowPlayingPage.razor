@@ -47,7 +47,7 @@
 
         try
         {
-            _nowPlayingMovies = await TMDBClient.GetNowPlayingMovies(_cancellationTokenSource.Token);
+            _nowPlayingMovies = await TMDBClient.GetNowPlayingMovies(cancellationToken: _cancellationTokenSource.Token);
         }
         catch (OperationCanceledException)
         {
