@@ -1,4 +1,6 @@
 ﻿@page "/popular"
+@inject TMDBClient TMDBClient
+@inject ILogger<NowPlayingPage> Logger
 
 <PageTitle>Popular</PageTitle>
 <div>
@@ -7,8 +9,65 @@
         Popular Movies
     </h1>
     <p class="lead italic">Movies that are currently popular with TMDB users.</p>
+    <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
+        @if (_popularMovies is null)
+        {
+            <div class="d-flex justify-content-center align-items-center">
+                @if (_isLoading)
+                {
+                    <h2>Loading Popular movies...</h2>
+                }
+                else
+                {
+                    <h2 class="text-muted">Failed to load Popular movies.</h2>
+                }
+            </div>
+        }
+        else
+        {
+            @foreach (var movie in _popularMovies.Results)
+            {
+                <div class="col">
+                    <MovieCard Movie="movie"></MovieCard>
+                </div>
+            }
+        }
+    </div>
 </div>
 
 @code {
+    private CancellationTokenSource? _cancellationTokenSource;
+    private MovieListResponse? _popularMovies;
+    private bool _isLoading;
 
+    protected override async Task OnInitializedAsync()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        _isLoading = true;
+
+        try
+        {
+            _popularMovies = await TMDBClient.GetPopularMovies(cancellationToken: _cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.LogDebug($"{nameof(TMDBClient.GetPopularMovies)} request was cancelled.");
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Logger.LogError(httpRequestException, $"{nameof(TMDBClient.GetPopularMovies)} - an error occurred.");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+    }
 }
+
