@@ -1,6 +1,6 @@
 ﻿@page "/popular"
 @inject TMDBClient TMDBClient
-@inject ILogger<NowPlayingPage> Logger
+@inject ILogger<Popular> Logger
 
 <PageTitle>Popular</PageTitle>
 <div>
@@ -9,30 +9,7 @@
         Popular Movies
     </h1>
     <p class="lead italic">Movies that are currently popular with TMDB users.</p>
-    <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
-        @if (_popularMovies is null)
-        {
-            <div class="d-flex justify-content-center align-items-center">
-                @if (_isLoading)
-                {
-                    <h2>Loading Popular movies...</h2>
-                }
-                else
-                {
-                    <h2 class="text-muted">Failed to load Popular movies.</h2>
-                }
-            </div>
-        }
-        else
-        {
-            @foreach (var movie in _popularMovies.Results)
-            {
-                <div class="col">
-                    <MovieCard Movie="movie"></MovieCard>
-                </div>
-            }
-        }
-    </div>
+    <MovieList Movies="_popularMovies" IsLoading="_isLoading" CategoryLabel="Popular" />
 </div>
 
 @code {
@@ -70,4 +47,3 @@
         _cancellationTokenSource?.Dispose();
     }
 }
-

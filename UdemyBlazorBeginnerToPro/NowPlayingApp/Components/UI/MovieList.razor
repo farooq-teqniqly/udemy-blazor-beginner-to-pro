@@ -1,0 +1,35 @@
+<div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
+    @if (Movies is null)
+    {
+        <div class="d-flex justify-content-center align-items-center">
+            @if (IsLoading)
+            {
+                <h2>Loading @CategoryLabel movies...</h2>
+            }
+            else
+            {
+                <h2 class="text-muted">Failed to load @CategoryLabel movies.</h2>
+            }
+        </div>
+    }
+    else
+    {
+        @foreach (var movie in Movies.Results)
+        {
+            <div class="col">
+                <MovieCard Movie="movie"></MovieCard>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public MovieListResponse? Movies { get; set; }
+
+    [Parameter, EditorRequired]
+    public bool IsLoading { get; set; }
+
+    [Parameter, EditorRequired]
+    public string CategoryLabel { get; set; } = string.Empty;
+}
