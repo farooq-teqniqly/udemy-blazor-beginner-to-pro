@@ -50,6 +50,13 @@ context: |
     - Namespaces: block-scoped in the app project, file-scoped in the tests
       project. Match the folder structure.
     - _Imports.razor centralizes common using directives for all components.
+    - Blazor component parameters: use `[Parameter, EditorRequired]` on every
+      parameter the parent must bind (for example state passed from a page).
+      Omit `EditorRequired` only for truly optional parameters that have a
+      documented default and are safe when unset. In Razor `@code`, combine
+      attributes as `[Parameter, EditorRequired]` on the same line as the
+      property. This matches `MovieList` and gives compile-time and analyzer
+      feedback when a caller forgets a required attribute in markup.
 
   Testing conventions:
     - xUnit with [Fact] (and [Theory] when parameterized).
@@ -84,6 +91,10 @@ rules:
       typed HttpClients, and note whether AddStandardResilienceHandler applies.
     - Note any new TMDBClientSettings properties and whether they belong in
       wwwroot/appsettings.json or user-secrets.
+    - When introducing or changing Razor components with `[Parameter]`
+      properties, state which parameters are required vs optional. Required
+      parameters MUST use `[Parameter, EditorRequired]` in implementation
+      unless there is an explicit reason not to (document that reason).
   tasks:
     - Break tasks into chunks of at most 2 hours of focused work.
     - Pair every Services or Models change with a matching task in
@@ -92,3 +103,6 @@ rules:
       is introduced.
     - Include a task to add or update a Bruno request under
       NowPlayingApp/BrunoTests/TMDB when a new TMDB endpoint is consumed.
+    - When tasks add or change Blazor component parameters that parents must
+      supply, include a task to apply `[Parameter, EditorRequired]` and to
+      verify all call sites in `.razor` files bind those parameters.
