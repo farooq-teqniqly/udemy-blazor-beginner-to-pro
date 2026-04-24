@@ -1,0 +1,21 @@
+<div class="loading-spinner @CssClass">
+    <div
+        class="spinner-border text-primary"
+        role="status"
+        style="width: @(SizeRem)rem; height: @(SizeRem)rem;"
+    >
+        <span class="visually-hidden">@Label</span>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "Loading...";
+
+    [Parameter]
+    public double SizeRem { get; set; } = 2;
+
+    [Parameter]
+    public string CssClass { get; set; } = string.Empty;
+}
+
