@@ -1,7 +1,21 @@
-﻿@inject TMDBClient TMDBClient
-
-<div class="card h-100 movie-card">
-    <img src="@GetPosterUri(Movie.PosterPath)" alt="Movie poster" class="card-img-top" />
+﻿<div class="card h-100 movie-card">
+    <div
+        class="movie-card-poster @(_isPosterLoading ? "movie-card-poster--busy" : null)"
+        aria-busy="@_isPosterLoading"
+    >
+        @if (_isPosterLoading)
+        {
+            <div class="movie-card-poster__spinner" aria-hidden="true">
+                <LoadingSpinner Label="Loading poster" />
+            </div>
+        }
+        <img
+            src="@_posterSrc"
+            alt="@Movie.Title"
+            class="card-img-top movie-card-poster__image @(_isPosterLoading ? "movie-card-poster__image--loading" : null)"
+            @onload="HandlePosterLoad"
+            @onerror="HandlePosterError" />
+    </div>
     <div class="card-body border border-top">
         <div class="card-title fw-bold lh-1">@Movie.Title</div>
         <div class="card-text lh-1 fst-italic">Release date: @GetFormattedDate(Movie.ReleaseDate)</div>
@@ -11,19 +25,3 @@
         <a href="moviedetail" class="btn btn-primary">More info</a>
     </div>
 </div>
-@code {
-
-    [Parameter, EditorRequired]
-    public MovieResponse Movie { get; set; }
-
-    private string GetFormattedDate(string rawDate)
-    {
-        return DateTime.TryParse(rawDate, out var parsedDate) ? parsedDate.ToString("MMMM dd, yyyy") : "Unknown";
-    }
-
-    private string GetPosterUri(string posterPath)
-    {
-        return TMDBClient.GetPosterUri(posterPath).ToString();
-    }
-
-}
