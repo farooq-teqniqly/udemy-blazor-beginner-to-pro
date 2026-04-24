@@ -7,9 +7,13 @@ namespace NowPlayingApp.Services
 {
     public sealed class TMDBClient
     {
+        public static SortByField Popularity = new("popularity");
+        public static SortByField PrimaryReleaseDate = new("primary_release_date");
         private const string DateFormat = "yyyy-MM-dd";
         private readonly HttpClient _http;
         private readonly TMDBClientSettings _settings;
+
+        public record SortByField(string FieldName);
 
         public TMDBClient(HttpClient http, IOptions<TMDBClientSettings> settings)
         {
@@ -25,6 +29,39 @@ namespace NowPlayingApp.Services
             CancellationToken cancellationToken = default
         )
         {
+            return await GetMovies(PrimaryReleaseDate, inLastDays, cancellationToken);
+        }
+
+        public async Task<MovieListResponse> GetPopularMovies(
+            int inLastDays = 14,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return await GetMovies(Popularity, inLastDays, cancellationToken);
+        }
+
+        public Uri GetPosterUri(string posterPath)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(_settings.TMDBImageBaseAddress);
+
+            if (string.IsNullOrEmpty(posterPath))
+            {
+                return new Uri("/images/poster.png", UriKind.Relative);
+            }
+
+            // TMDB poster paths often start with '/'. new Uri(base, "/x.jpg") replaces the base path
+            // with an absolute-on-host path; normalize so /t/p/w500 is preserved.
+            var baseUri = new Uri(_settings.TMDBImageBaseAddress.TrimEnd('/') + "/");
+            var relativePath = posterPath.TrimStart('/');
+            return new Uri(baseUri, relativePath);
+        }
+
+        private async Task<MovieListResponse> GetMovies(
+            SortByField sortByField,
+            int inLastDays = 14,
+            CancellationToken cancellationToken = default
+        )
+        {
             ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(inLastDays, 0);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(inLastDays, 30);
 
@@ -33,7 +70,7 @@ namespace NowPlayingApp.Services
             var releaseDateLte = now.ToString(DateFormat);
 
             var requestUri =
-                $"discover/movie?language=en-US&page=1&sort_by=popularity.desc&primary_release_date.gte={releaseDateGte}&primary_release_date.lte={releaseDateLte}&with_original_language=en";
+                $"discover/movie?language=en-US&page=1&sort_by={sortByField.FieldName}.desc&primary_release_date.gte={releaseDateGte}&primary_release_date.lte={releaseDateLte}&with_original_language=en";
 
             var response = await _http.GetAsync(requestUri, cancellationToken);
             response.EnsureSuccessStatusCode();
@@ -51,22 +88,6 @@ namespace NowPlayingApp.Services
                 );
             }
             return movieListResponse;
-        }
-
-        public Uri GetPosterUri(string posterPath)
-        {
-            ArgumentException.ThrowIfNullOrEmpty(_settings.TMDBImageBaseAddress);
-
-            if (string.IsNullOrEmpty(posterPath))
-            {
-                return new Uri("/images/poster.png", UriKind.Relative);
-            }
-
-            // TMDB poster paths often start with '/'. new Uri(base, "/x.jpg") replaces the base path
-            // with an absolute-on-host path; normalize so /t/p/w500 is preserved.
-            var baseUri = new Uri(_settings.TMDBImageBaseAddress.TrimEnd('/') + "/");
-            var relativePath = posterPath.TrimStart('/');
-            return new Uri(baseUri, relativePath);
         }
     }
 }

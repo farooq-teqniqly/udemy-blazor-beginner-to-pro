@@ -1,4 +1,6 @@
 ﻿@page "/popular"
+@inject TMDBClient TMDBClient
+@inject ILogger<Popular> Logger
 
 <PageTitle>Popular</PageTitle>
 <div>
@@ -7,8 +9,41 @@
         Popular Movies
     </h1>
     <p class="lead italic">Movies that are currently popular with TMDB users.</p>
+    <MovieList Movies="_popularMovies" IsLoading="_isLoading" CategoryLabel="Popular" />
 </div>
 
 @code {
+    private CancellationTokenSource? _cancellationTokenSource;
+    private MovieListResponse? _popularMovies;
+    private bool _isLoading;
 
+    protected override async Task OnInitializedAsync()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        _isLoading = true;
+
+        try
+        {
+            _popularMovies = await TMDBClient.GetPopularMovies(cancellationToken: _cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.LogDebug($"{nameof(TMDBClient.GetPopularMovies)} request was cancelled.");
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Logger.LogError(httpRequestException, $"{nameof(TMDBClient.GetPopularMovies)} - an error occurred.");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+    }
 }

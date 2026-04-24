@@ -9,30 +9,7 @@
         Now Playing
     </h1>
     <p class="lead italic">Movies that are now playing in theaters.</p>
-    <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
-        @if (_nowPlayingMovies is null)
-        {
-            <div class="d-flex justify-content-center align-items-center">
-                @if (_isLoading)
-                {
-                    <h2>Loading Now Playing movies...</h2>
-                }
-                else
-                {
-                    <h2 class="text-muted">Failed to load Now Playing movies.</h2>
-                }
-            </div>
-        }
-        else
-        {
-            @foreach (var movie in _nowPlayingMovies.Results)
-            {
-                <div class="col">
-                    <MovieCard Movie="movie"></MovieCard>
-                </div>
-            }
-        }
-    </div>
+    <MovieList Movies="_nowPlayingMovies" IsLoading="_isLoading" CategoryLabel="Now Playing" />
 </div>
 
 @code {
