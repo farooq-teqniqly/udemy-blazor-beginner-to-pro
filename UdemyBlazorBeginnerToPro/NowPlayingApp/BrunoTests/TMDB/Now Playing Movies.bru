@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1&&sort_by=primary_release_date.desc&release_date.gte=2026-04-01&with_original_language=en
+  url: https://api.themoviedb.org/3/discover/movie?language=en-US&page=1&&sort_by=primary_release_date.desc&release_date.gte=2026-04-01&release_date.lte=2026-05-01&with_original_language=en
   body: none
   auth: inherit
 }
@@ -15,6 +15,7 @@ params:query {
   page: 1
   sort_by: primary_release_date.desc
   release_date.gte: 2026-04-01
+  release_date.lte: 2026-05-01
   with_original_language: en
 }
 
