@@ -45,10 +45,32 @@ namespace NowPlayingApp.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting favorite movies from local storage.");
+                _logger.LogError(e, "Error removing favorite movie from local storage.");
             }
 
             return movies;
+        }
+
+        public async Task<bool> IsFavorite(int movieId)
+        {
+            var current = await GetFavoritesAsync();
+            return current.Any(m => m.Id == movieId);
+        }
+
+        public async Task RemoveFavoriteAsync(MovieResponse movie)
+        {
+            ArgumentNullException.ThrowIfNull(movie);
+
+            try
+            {
+                var current = await GetFavoritesAsync();
+                current = current.Where(m => m.Id != movie.Id).ToList();
+                await SaveFavoritesAsync(current);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error saving favorite movies to local storage.");
+            }
         }
 
         public async Task SaveFavoritesAsync(List<MovieResponse> movies)

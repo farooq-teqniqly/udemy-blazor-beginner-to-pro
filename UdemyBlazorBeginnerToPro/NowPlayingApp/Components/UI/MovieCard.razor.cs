@@ -18,6 +18,8 @@ public partial class MovieCard
         _favoritesService = favoritesService;
     }
 
+    public bool IsFavorite { get; set; }
+
     [Parameter, EditorRequired]
     public MovieResponse Movie { get; set; } = null!;
 
@@ -44,7 +46,7 @@ public partial class MovieCard
 
     internal void HandlePosterLoad() => _isPosterLoading = false;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         var newSrc = GetPosterUriString(Movie.PosterPath);
         if (!string.Equals(newSrc, _posterSrc, StringComparison.Ordinal))
@@ -52,6 +54,8 @@ public partial class MovieCard
             _posterSrc = newSrc;
             _isPosterLoading = true;
         }
+
+        IsFavorite = await _favoritesService.IsFavorite(Movie.Id);
     }
 
     private string GetFallbackPosterPath() => GetPosterUriString(string.Empty);
@@ -66,6 +70,13 @@ public partial class MovieCard
 
     private async Task HandleToggleFavorite()
     {
-        await _favoritesService.AddFavoriteAsync(Movie);
+        if (IsFavorite)
+        {
+            await _favoritesService.RemoveFavoriteAsync(Movie);
+        }
+        else
+        {
+            await _favoritesService.AddFavoriteAsync(Movie);
+        }
     }
 }
