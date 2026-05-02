@@ -10,6 +10,3 @@ auth:bearer {
   token: {{TMDB_ACCESS_KEY}}
 }
 
-script:pre-request {
-  bru.setEnvVar("TMDB_ACCESS_KEY", process.env.TMDB_ACCESS_KEY);
-}

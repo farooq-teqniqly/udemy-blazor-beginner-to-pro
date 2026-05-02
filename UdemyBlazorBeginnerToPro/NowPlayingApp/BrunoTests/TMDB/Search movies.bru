@@ -1,0 +1,31 @@
+meta {
+  name: Search movies
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://api.themoviedb.org/3/search/movie?query=godfather&include_adult=false&language=en-US&page=1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: godfather
+  include_adult: false
+  language: en-US
+  page: 1
+  : 
+}
+
+assert {
+  res.status: eq 200
+  res.body.page: eq 1
+  res.body.total_pages: gte 1
+  res.body.total_results: gte 1
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
