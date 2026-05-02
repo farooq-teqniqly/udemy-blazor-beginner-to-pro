@@ -1,6 +1,4 @@
-﻿@page "/search"
-@inject TMDBClient TMDBClient
-@inject ILogger<Search> Logger
+@page "/search"
 
 <PageTitle>Search Results</PageTitle>
 <div>
@@ -22,48 +20,3 @@
     
 </div>
 
-@code {
-    private CancellationTokenSource? _cancellationTokenSource;
-    private List<MovieResponse>? _searchResults;
-    private bool _isLoading;
-
-    [SupplyParameterFromQuery(Name = "q")]
-    public string? Query { get; set; }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (string.IsNullOrEmpty(Query))
-        {
-            Logger.LogDebug($"{nameof(Search.OnInitializedAsync)} - received null or empty query string.");
-            return;
-        }
-
-        _cancellationTokenSource = new CancellationTokenSource();
-        _isLoading = true;
-
-        try
-        {
-            var response = await TMDBClient.SearchMovies(Query, _cancellationTokenSource.Token);
-            _searchResults = response.Results;
-        }
-        catch (OperationCanceledException)
-        {
-            Logger.LogDebug($"{nameof(TMDBClient.SearchMovies)} request was cancelled.");
-        }
-        catch (HttpRequestException httpRequestException)
-        {
-            Logger.LogError(httpRequestException, $"{nameof(TMDBClient.SearchMovies)} - an error occurred.");
-        }
-        finally
-        {
-            _isLoading = false;
-        }
-
-    }
-
-    public void Dispose()
-    {
-        _cancellationTokenSource?.Cancel();
-        _cancellationTokenSource?.Dispose();
-    }
-}
