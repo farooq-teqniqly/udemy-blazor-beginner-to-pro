@@ -14,7 +14,7 @@
 
 @code {
     private CancellationTokenSource? _cancellationTokenSource;
-    private MovieListResponse? _nowPlayingMovies;
+    private List<MovieResponse>? _nowPlayingMovies;
     private bool _isLoading;
 
     protected override async Task OnInitializedAsync()
@@ -24,7 +24,8 @@
 
         try
         {
-            _nowPlayingMovies = await TMDBClient.GetNowPlayingMovies(cancellationToken: _cancellationTokenSource.Token);
+            var response = await TMDBClient.GetNowPlayingMovies(cancellationToken: _cancellationTokenSource.Token);
+            _nowPlayingMovies = response.Results;
         }
         catch (OperationCanceledException)
         {

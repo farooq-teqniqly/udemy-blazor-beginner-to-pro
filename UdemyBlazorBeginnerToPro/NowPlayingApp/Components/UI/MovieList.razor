@@ -14,7 +14,7 @@
     }
     else
     {
-        @foreach (var movie in Movies.Results)
+        @foreach (var movie in Movies)
         {
             <div class="col">
                 <MovieCard Movie="movie"></MovieCard>
@@ -25,7 +25,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public MovieListResponse? Movies { get; set; }
+    public List<MovieResponse>? Movies { get; set; }
 
     [Parameter, EditorRequired]
     public bool IsLoading { get; set; }

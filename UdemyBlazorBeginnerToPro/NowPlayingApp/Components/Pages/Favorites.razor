@@ -1,4 +1,4 @@
-﻿@page "/favorites"
+@page "/favorites"
 
 <PageTitle>Favorites</PageTitle>
 <div>
@@ -7,7 +7,5 @@
         Favorites
     </h1>
     <p class="lead italic">Your favorite movies.</p>
+    <MovieList Movies="_favoriteMovies" IsLoading="_isLoading" CategoryLabel="Favorites" />
 </div>
-@code {
-
-}

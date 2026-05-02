@@ -34,13 +34,7 @@ public class MovieListTests
     [Fact]
     public void Movies_When_Set_Returns_AssignedInstance()
     {
-        var movies = new MovieListResponse
-        {
-            Page = 1,
-            TotalPages = 1,
-            TotalResults = 0,
-            Results = [],
-        };
+        var movies = new List<MovieResponse>();
         var sut = new MovieList { Movies = movies };
 
         Assert.Same(movies, sut.Movies);

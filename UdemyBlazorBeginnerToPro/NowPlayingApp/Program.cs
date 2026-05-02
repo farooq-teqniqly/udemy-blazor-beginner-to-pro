@@ -41,6 +41,9 @@ namespace NowPlayingApp
                 )
                 .AddStandardResilienceHandler();
 
+            builder.Services.AddScoped<LocalStorageService>();
+            builder.Services.AddScoped<IFavoritesService, FavoritesService>();
+
             await builder.Build().RunAsync();
         }
 
