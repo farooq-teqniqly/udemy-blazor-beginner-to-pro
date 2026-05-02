@@ -92,6 +92,33 @@ namespace NowPlayingApp.Services
             return new Uri(baseUri, relativePath);
         }
 
+        /// <summary>
+        /// Searches for movies matching the specified query string using the TMDB API.
+        /// </summary>
+        /// <param name="query">The search query string for movie titles.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>
+        /// A <see cref="MovieListResponse"/> containing the list of movies that match the search query.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown if <paramref name="query"/> is null or empty.
+        /// </exception>
+        /// <exception cref="HttpRequestException">
+        /// Thrown if the HTTP request fails or the response cannot be deserialized.
+        /// </exception>
+        public async Task<MovieListResponse> SearchMovies(
+            string query,
+            CancellationToken cancellationToken = default
+        )
+        {
+            ArgumentException.ThrowIfNullOrEmpty(query);
+
+            var requestUri =
+                $"search/movie?query={query}&include_adult=false&language=en-US&page=1";
+
+            return await GetMoviesAsync(requestUri, cancellationToken);
+        }
+
         private async Task<MovieListResponse> GetMovies(
             SortByField sortByField,
             int inLastDays = 14,
@@ -108,6 +135,14 @@ namespace NowPlayingApp.Services
             var requestUri =
                 $"discover/movie?language=en-US&page=1&sort_by={sortByField.FieldName}.desc&primary_release_date.gte={releaseDateGte}&primary_release_date.lte={releaseDateLte}&with_original_language=en";
 
+            return await GetMoviesAsync(requestUri, cancellationToken);
+        }
+
+        private async Task<MovieListResponse> GetMoviesAsync(
+            string requestUri,
+            CancellationToken cancellationToken = default
+        )
+        {
             var response = await _http.GetAsync(requestUri, cancellationToken);
             response.EnsureSuccessStatusCode();
 

@@ -1,0 +1,69 @@
+﻿@page "/search"
+@inject TMDBClient TMDBClient
+@inject ILogger<Search> Logger
+
+<PageTitle>Search Results</PageTitle>
+<div>
+    <h1>
+        <i class="bi bi-search text-primary"></i>
+        Search Results
+    </h1>
+    @if (_searchResults is null || _searchResults?.Count == 0)
+    {
+        <div class="d-flex justify-content-center align-items-center py-5">
+            <h2 class="text-muted">No movies found for your search.</h2>
+        </div>
+    }
+    else
+    {
+        <p class="lead italic">Movies matching your search.</p>
+        <MovieList Movies="_searchResults" IsLoading="_isLoading" CategoryLabel="Search Results" />
+    }
+    
+</div>
+
+@code {
+    private CancellationTokenSource? _cancellationTokenSource;
+    private List<MovieResponse>? _searchResults;
+    private bool _isLoading;
+
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? Query { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrEmpty(Query))
+        {
+            Logger.LogDebug($"{nameof(Search.OnInitializedAsync)} - received null or empty query string.");
+            return;
+        }
+
+        _cancellationTokenSource = new CancellationTokenSource();
+        _isLoading = true;
+
+        try
+        {
+            var response = await TMDBClient.SearchMovies(Query, _cancellationTokenSource.Token);
+            _searchResults = response.Results;
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.LogDebug($"{nameof(TMDBClient.SearchMovies)} request was cancelled.");
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Logger.LogError(httpRequestException, $"{nameof(TMDBClient.SearchMovies)} - an error occurred.");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+    }
+}
