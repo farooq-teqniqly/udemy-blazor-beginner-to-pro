@@ -2,12 +2,20 @@ using NowPlayingApp.Models;
 
 namespace NowPlayingApp.Services
 {
+    /// <summary>
+    /// Manages favorite movies persisted in browser local storage.
+    /// </summary>
     public class FavoritesService : IFavoritesService
     {
         private const string localStorageKey = "favorites";
         private readonly LocalStorageService _localStorageService;
         private readonly ILogger<FavoritesService> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FavoritesService"/> class.
+        /// </summary>
+        /// <param name="localStorageService">The local storage abstraction.</param>
+        /// <param name="logger">The logger used for persistence failures.</param>
         public FavoritesService(
             LocalStorageService localStorageService,
             ILogger<FavoritesService> logger
@@ -20,8 +28,10 @@ namespace NowPlayingApp.Services
             _logger = logger;
         }
 
+        /// <inheritdoc />
         public event EventHandler? FavoritesChanged;
 
+        /// <inheritdoc />
         public async Task AddFavoriteAsync(MovieResponse movie)
         {
             ArgumentNullException.ThrowIfNull(movie);
@@ -35,6 +45,7 @@ namespace NowPlayingApp.Services
             }
         }
 
+        /// <inheritdoc />
         public async Task<List<MovieResponse>> GetFavoritesAsync()
         {
             List<MovieResponse> movies = [];
@@ -53,12 +64,14 @@ namespace NowPlayingApp.Services
             return movies;
         }
 
+        /// <inheritdoc />
         public async Task<bool> IsFavorite(int movieId)
         {
             var current = await GetFavoritesAsync();
             return current.Any(m => m.Id == movieId);
         }
 
+        /// <inheritdoc />
         public async Task RemoveFavoriteAsync(MovieResponse movie)
         {
             ArgumentNullException.ThrowIfNull(movie);
@@ -79,6 +92,7 @@ namespace NowPlayingApp.Services
             }
         }
 
+        /// <inheritdoc />
         public async Task SaveFavoritesAsync(List<MovieResponse> movies)
         {
             ArgumentNullException.ThrowIfNull(movies);

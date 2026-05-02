@@ -6,8 +6,15 @@ using NowPlayingApp.Services;
 
 namespace NowPlayingApp
 {
+    /// <summary>
+    /// Application entry point for the NowPlayingApp Blazor WebAssembly client.
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Configures services and starts the Blazor WebAssembly host.
+        /// </summary>
+        /// <param name="args">Command-line arguments passed to the app.</param>
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -55,10 +62,24 @@ namespace NowPlayingApp
         }
     }
 
+    /// <summary>
+    /// Strongly typed configuration settings used by <see cref="Services.TMDBClient"/>.
+    /// </summary>
     public sealed class TMDBClientSettings
     {
+        /// <summary>
+        /// Gets or sets the TMDB API base address used for REST requests.
+        /// </summary>
         public string? TMDBApiBaseAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TMDB image CDN base address used to compose poster URLs.
+        /// </summary>
         public string? TMDBImageBaseAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TMDB bearer token used for API authentication.
+        /// </summary>
         public string? TMDBAccessKey { get; set; }
     }
 }

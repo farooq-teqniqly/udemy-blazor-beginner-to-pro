@@ -11,13 +11,16 @@ public class FavoritesServiceTests
     [Fact]
     public async Task AddFavoriteAsync_When_MovieAdded_Raises_FavoritesChanged()
     {
+        // Arrange
         var sut = CreateSut(out var jsRuntime);
         var movie = new MovieResponse { Id = 1, Title = "Movie 1" };
         var eventRaisedCount = 0;
         sut.FavoritesChanged += (_, _) => eventRaisedCount++;
 
+        // Act
         await sut.AddFavoriteAsync(movie);
 
+        // Assert
         Assert.Equal(1, eventRaisedCount);
         var stored = jsRuntime.GetStoredMovies("favorites");
         Assert.Single(stored);
@@ -27,12 +30,15 @@ public class FavoritesServiceTests
     [Fact]
     public async Task AddFavoriteAsync_When_MovieWithSameIdExists_DoesNotDuplicate()
     {
+        // Arrange
         var sut = CreateSut(out var jsRuntime);
         await sut.SaveFavoritesAsync([new MovieResponse { Id = 7, Title = "Saved once" }]);
         var replacementReference = new MovieResponse { Id = 7, Title = "Saved twice reference" };
 
+        // Act
         await sut.AddFavoriteAsync(replacementReference);
 
+        // Assert
         var stored = jsRuntime.GetStoredMovies("favorites");
         Assert.Single(stored);
         Assert.Equal(7, stored[0].Id);
@@ -41,6 +47,7 @@ public class FavoritesServiceTests
     [Fact]
     public async Task RemoveFavoriteAsync_When_MovieRemoved_Raises_FavoritesChanged()
     {
+        // Arrange
         var sut = CreateSut(out _);
         await sut.SaveFavoritesAsync(
             [
@@ -52,8 +59,10 @@ public class FavoritesServiceTests
         var eventRaisedCount = 0;
         sut.FavoritesChanged += (_, _) => eventRaisedCount++;
 
+        // Act
         await sut.RemoveFavoriteAsync(new MovieResponse { Id = 2, Title = "Movie 2" });
 
+        // Assert
         Assert.Equal(1, eventRaisedCount);
     }
 

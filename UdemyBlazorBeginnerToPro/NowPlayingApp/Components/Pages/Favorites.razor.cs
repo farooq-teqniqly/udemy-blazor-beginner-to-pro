@@ -4,6 +4,9 @@ using NowPlayingApp.Services;
 
 namespace NowPlayingApp.Components.Pages;
 
+/// <summary>
+/// Page component that displays the user's favorite movies.
+/// </summary>
 public partial class Favorites : IDisposable
 {
     private readonly IFavoritesService _favoritesService;
@@ -12,6 +15,11 @@ public partial class Favorites : IDisposable
     private List<MovieResponse>? _favoriteMovies;
     private bool _isLoading;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Favorites"/> class.
+    /// </summary>
+    /// <param name="favoritesService">Service used to load and track favorite movies.</param>
+    /// <param name="logger">Logger used for favorites load errors.</param>
     public Favorites(IFavoritesService favoritesService, ILogger<Favorites> logger)
     {
         ArgumentNullException.ThrowIfNull(favoritesService);
@@ -35,6 +43,9 @@ public partial class Favorites : IDisposable
         await LoadFavoritesAsync();
     }
 
+    /// <summary>
+    /// Unsubscribes from favorites change notifications.
+    /// </summary>
     public void Dispose()
     {
         _favoritesService.FavoritesChanged -= HandleFavoritesChanged;

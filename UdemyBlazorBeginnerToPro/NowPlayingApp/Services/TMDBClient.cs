@@ -1,20 +1,39 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Options;
 using NowPlayingApp.Models;
 
 namespace NowPlayingApp.Services
 {
+    /// <summary>
+    /// Client for retrieving movie data and poster URLs from TMDB.
+    /// </summary>
     public sealed class TMDBClient
     {
+        /// <summary>
+        /// Sort field value for popularity-based movie discovery.
+        /// </summary>
         public static SortByField Popularity = new("popularity");
+
+        /// <summary>
+        /// Sort field value for primary release date-based movie discovery.
+        /// </summary>
         public static SortByField PrimaryReleaseDate = new("primary_release_date");
         private const string DateFormat = "yyyy-MM-dd";
         private readonly HttpClient _http;
         private readonly TMDBClientSettings _settings;
 
+        /// <summary>
+        /// Represents a TMDB sort field identifier.
+        /// </summary>
+        /// <param name="FieldName">The TMDB API sort field name.</param>
         public record SortByField(string FieldName);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TMDBClient"/> class.
+        /// </summary>
+        /// <param name="http">HTTP client configured for TMDB calls.</param>
+        /// <param name="settings">Application settings that provide TMDB endpoints and token.</param>
         public TMDBClient(HttpClient http, IOptions<TMDBClientSettings> settings)
         {
             ArgumentNullException.ThrowIfNull(http);
@@ -24,6 +43,12 @@ namespace NowPlayingApp.Services
             _settings = settings.Value;
         }
 
+        /// <summary>
+        /// Retrieves movies released within the requested date window sorted by release date.
+        /// </summary>
+        /// <param name="inLastDays">Number of days back from today to include.</param>
+        /// <param name="cancellationToken">Cancellation token for the request.</param>
+        /// <returns>A list response containing now-playing movies.</returns>
         public async Task<MovieListResponse> GetNowPlayingMovies(
             int inLastDays = 14,
             CancellationToken cancellationToken = default
@@ -32,6 +57,12 @@ namespace NowPlayingApp.Services
             return await GetMovies(PrimaryReleaseDate, inLastDays, cancellationToken);
         }
 
+        /// <summary>
+        /// Retrieves movies released within the requested date window sorted by popularity.
+        /// </summary>
+        /// <param name="inLastDays">Number of days back from today to include.</param>
+        /// <param name="cancellationToken">Cancellation token for the request.</param>
+        /// <returns>A list response containing popular movies.</returns>
         public async Task<MovieListResponse> GetPopularMovies(
             int inLastDays = 14,
             CancellationToken cancellationToken = default
@@ -40,6 +71,11 @@ namespace NowPlayingApp.Services
             return await GetMovies(Popularity, inLastDays, cancellationToken);
         }
 
+        /// <summary>
+        /// Builds a poster URI for a TMDB poster path or returns the local fallback poster.
+        /// </summary>
+        /// <param name="posterPath">Poster path returned by TMDB.</param>
+        /// <returns>An absolute TMDB image URI or a relative fallback URI.</returns>
         public Uri GetPosterUri(string posterPath)
         {
             ArgumentException.ThrowIfNullOrEmpty(_settings.TMDBImageBaseAddress);

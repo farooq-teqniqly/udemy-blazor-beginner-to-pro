@@ -4,6 +4,9 @@ using NowPlayingApp.Services;
 
 namespace NowPlayingApp.Components.UI;
 
+/// <summary>
+/// Renders a movie card with poster and favorite toggle interactions.
+/// </summary>
 public partial class MovieCard : IDisposable
 {
     private readonly IFavoritesService _favoritesService;
@@ -11,6 +14,10 @@ public partial class MovieCard : IDisposable
     private bool _isPosterLoading = true;
     private string _posterSrc = string.Empty;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MovieCard"/> class.
+    /// </summary>
+    /// <param name="favoritesService">Service used to query and update favorite state.</param>
     public MovieCard(IFavoritesService favoritesService)
     {
         ArgumentNullException.ThrowIfNull(favoritesService);
@@ -18,11 +25,20 @@ public partial class MovieCard : IDisposable
         _favoritesService = favoritesService;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the current movie is a favorite.
+    /// </summary>
     public bool IsFavorite { get; set; }
 
+    /// <summary>
+    /// Gets or sets the movie displayed by the card.
+    /// </summary>
     [Parameter, EditorRequired]
     public MovieResponse Movie { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the TMDB client used to resolve poster URLs.
+    /// </summary>
     [Inject]
     public TMDBClient TMDBClient { get; set; } = null!;
     internal bool IsPosterLoading => _isPosterLoading;
@@ -105,6 +121,9 @@ public partial class MovieCard : IDisposable
         IsFavorite = await _favoritesService.IsFavorite(Movie.Id);
     }
 
+    /// <summary>
+    /// Unsubscribes from favorites events when the component is disposed.
+    /// </summary>
     public void Dispose()
     {
         _favoritesService.FavoritesChanged -= HandleFavoritesChanged;

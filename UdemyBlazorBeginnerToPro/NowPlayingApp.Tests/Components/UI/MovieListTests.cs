@@ -10,49 +10,79 @@ public class MovieListTests
     [Fact]
     public void Movies_When_DefaultConstructed_Returns_Null()
     {
+        // Arrange
         var sut = new MovieList();
 
-        Assert.Null(sut.Movies);
+        // Act
+        var movies = sut.Movies;
+
+        // Assert
+        Assert.Null(movies);
     }
 
     [Fact]
     public void IsLoading_When_DefaultConstructed_Returns_False()
     {
+        // Arrange
         var sut = new MovieList();
 
-        Assert.False(sut.IsLoading);
+        // Act
+        var isLoading = sut.IsLoading;
+
+        // Assert
+        Assert.False(isLoading);
     }
 
     [Fact]
     public void CategoryLabel_When_DefaultConstructed_Returns_EmptyString()
     {
+        // Arrange
         var sut = new MovieList();
 
-        Assert.Equal(string.Empty, sut.CategoryLabel);
+        // Act
+        var categoryLabel = sut.CategoryLabel;
+
+        // Assert
+        Assert.Equal(string.Empty, categoryLabel);
     }
 
     [Fact]
     public void Movies_When_Set_Returns_AssignedInstance()
     {
+        // Arrange
         var movies = new List<MovieResponse>();
         var sut = new MovieList { Movies = movies };
 
-        Assert.Same(movies, sut.Movies);
+        // Act
+        var assignedMovies = sut.Movies;
+
+        // Assert
+        Assert.Same(movies, assignedMovies);
     }
 
     [Fact]
     public void IsLoading_When_Set_Returns_AssignedValue()
     {
+        // Arrange
         var sut = new MovieList { IsLoading = true };
 
-        Assert.True(sut.IsLoading);
+        // Act
+        var isLoading = sut.IsLoading;
+
+        // Assert
+        Assert.True(isLoading);
     }
 
     [Fact]
     public void CategoryLabel_When_Set_Returns_AssignedValue()
     {
+        // Arrange
         var sut = new MovieList { CategoryLabel = "Popular" };
 
-        Assert.Equal("Popular", sut.CategoryLabel);
+        // Act
+        var categoryLabel = sut.CategoryLabel;
+
+        // Assert
+        Assert.Equal("Popular", categoryLabel);
     }
 }
