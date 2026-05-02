@@ -3,14 +3,13 @@
         <a href="/" class="me-3">
             <img src="/images/MagicCodeSquareLogo.png" alt="MagicCode Logo" height="40" />
         </a>
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarContent"
-            aria-controls="#navbarContent"
-            aria-expanded="False"
-            aria-label="Toggle navigation">
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarContent"
+                aria-controls="#navbarContent"
+                aria-expanded="False"
+                aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <!-- Menu links -->
@@ -41,6 +40,20 @@
                     </NavLink>
                 </li>
             </ul>
+            <form class="d-flex" role="search">
+                <InputText 
+                    name="search" 
+                    class="form-control form-control-sm me-2" 
+                    type="search" 
+                    placeholder="Search movies" 
+                    aria-label="Search" 
+                    @bind-Value="_query"></InputText>
+                <button class="btn btn-sm btn-primary" type="button">Search</button>
+            </form>
         </div>
     </div>
 </nav>
+
+@code {
+    private string _query;
+}
