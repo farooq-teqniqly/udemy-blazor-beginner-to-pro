@@ -6,6 +6,8 @@ namespace NowPlayingApp.Components.UI;
 
 public partial class MovieCard
 {
+    private readonly FavoritesService _favoritesService;
+
     [Inject]
     public TMDBClient TMDBClient { get; set; } = null!;
 
@@ -18,6 +20,13 @@ public partial class MovieCard
     internal bool IsPosterLoading => _isPosterLoading;
 
     internal string PosterImageSrc => _posterSrc;
+
+    public MovieCard(FavoritesService favoritesService)
+    {
+        ArgumentNullException.ThrowIfNull(favoritesService);
+
+        _favoritesService = favoritesService;
+    }
 
     internal void ApplyOnParametersSetForTest() => OnParametersSet();
 
@@ -55,4 +64,9 @@ public partial class MovieCard
 
     private string GetPosterUriString(string posterPath) =>
         TMDBClient.GetPosterUri(posterPath).ToString();
+
+    private async Task HandleToggleFavorite()
+    {
+        await _favoritesService.AddFavoriteAsync(Movie);
+    }
 }

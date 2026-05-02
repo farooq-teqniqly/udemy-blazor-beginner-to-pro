@@ -45,4 +45,38 @@ public class MovieResponse
 
     [JsonPropertyName("vote_count")]
     public int VoteCount { get; set; }
+
+    public static bool operator !=(MovieResponse? left, MovieResponse? right)
+    {
+        return !(left == right);
+    }
+
+    public static bool operator ==(MovieResponse? left, MovieResponse? right)
+    {
+        if (ReferenceEquals(left, right))
+        {
+            return true;
+        }
+
+        if (left is null || right is null)
+        {
+            return false;
+        }
+
+        return left.Equals(right);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is MovieResponse other)
+        {
+            return Id == other.Id;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }

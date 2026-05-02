@@ -18,15 +18,7 @@ public class MovieCardTests
             new TMDBClientSettings { TMDBImageBaseAddress = "https://image.tmdb.org/t/p/w500" }
         );
         var client = new TMDBClient(new HttpClient(), options);
-        var sut = new MovieCard
-        {
-            TMDBClient = client,
-            Movie = new MovieResponse
-            {
-                Title = "Example Movie",
-                PosterPath = "/9Z2uDYXqJrlmePznQQJhL6d92Rq.jpg",
-            },
-        };
+        var sut = CreateMovieCardWithRemotePoster();
 
         Assert.True(sut.IsPosterLoading);
     }
@@ -62,11 +54,15 @@ public class MovieCardTests
     private static MovieCard CreateMovieCardWithRemotePoster()
     {
         var options = Substitute.For<IOptions<TMDBClientSettings>>();
+
         options.Value.Returns(
             new TMDBClientSettings { TMDBImageBaseAddress = "https://image.tmdb.org/t/p/w500" }
         );
+
         var client = new TMDBClient(new HttpClient(), options);
-        return new MovieCard
+        var favoritesService = Substitute.For<FavoritesService>();
+
+        return new MovieCard(favoritesService)
         {
             TMDBClient = client,
             Movie = new MovieResponse

@@ -21,7 +21,7 @@
         <div class="card-text lh-1 fst-italic">Release date: @GetFormattedDate(Movie.ReleaseDate)</div>
     </div>
     <div class="card-footer d-flex justify-content-between movie-card-footer">
-        <button class="btn btn-outline-primary">Add favorite</button>
+        <button class="btn btn-outline-primary" @onclick="HandleToggleFavorite">Add favorite</button>
         <a href="moviedetail" class="btn btn-primary">More info</a>
     </div>
 </div>

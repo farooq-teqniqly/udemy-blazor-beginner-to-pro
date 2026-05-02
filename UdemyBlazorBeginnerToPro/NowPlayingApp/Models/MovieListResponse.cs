@@ -8,7 +8,7 @@ namespace NowPlayingApp.Models
         public int Page { get; set; }
 
         [JsonPropertyName("results")]
-        public MovieResponse[] Results { get; set; } = [];
+        public List<MovieResponse> Results { get; set; } = [];
 
         [JsonPropertyName("total_pages")]
         public int TotalPages { get; set; }

@@ -1,4 +1,6 @@
 ﻿@page "/favorites"
+@inject FavoritesService FavoritesService
+@inject ILogger<Favorites> Logger
 
 <PageTitle>Favorites</PageTitle>
 <div>
@@ -7,7 +9,29 @@
         Favorites
     </h1>
     <p class="lead italic">Your favorite movies.</p>
+    <MovieList Movies="_favoriteMovies" IsLoading="_isLoading" CategoryLabel="Favorites" />
 </div>
 @code {
+    private List<MovieResponse>? _favoriteMovies;
+    private bool _isLoading;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+
+        try
+        {
+            _favoriteMovies = await FavoritesService.GetFavoritesAsync();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, $"{nameof(FavoritesService.GetFavoritesAsync)} - an error occurred.");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 
 }
