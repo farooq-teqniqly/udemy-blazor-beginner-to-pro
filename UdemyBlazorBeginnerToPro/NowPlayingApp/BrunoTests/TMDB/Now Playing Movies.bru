@@ -19,6 +19,13 @@ params:query {
   with_original_language: en
 }
 
+assert {
+  res.status: eq 200
+  res.body.page: eq 1
+  res.body.total_pages: gte 1
+  res.body.total_results: gte 1
+}
+
 settings {
   encodeUrl: true
   timeout: 0

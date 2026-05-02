@@ -1,0 +1,22 @@
+@page "/search"
+
+<PageTitle>Search Results</PageTitle>
+<div>
+    <h1>
+        <i class="bi bi-search text-primary"></i>
+        Search Results
+    </h1>
+    @if (_searchResults is null || _searchResults?.Count == 0)
+    {
+        <div class="d-flex justify-content-center align-items-center py-5">
+            <h2 class="text-muted">No movies found for your search.</h2>
+        </div>
+    }
+    else
+    {
+        <p class="lead italic">Movies matching your search.</p>
+        <MovieList Movies="_searchResults" IsLoading="_isLoading" CategoryLabel="Search Results" />
+    }
+    
+</div>
+
