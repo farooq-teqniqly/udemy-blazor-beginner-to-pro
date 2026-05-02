@@ -4,7 +4,7 @@ using NowPlayingApp.Services;
 
 namespace NowPlayingApp.Components.UI;
 
-public partial class MovieCard
+public partial class MovieCard : IDisposable
 {
     private readonly IFavoritesService _favoritesService;
 
@@ -31,6 +31,10 @@ public partial class MovieCard
 
     internal void ApplyOnParametersSetForTest() => OnParametersSet();
 
+    internal async Task ApplyOnParametersSetAsyncForTest() => await OnParametersSetAsync();
+
+    internal async Task HandleToggleFavoriteAsyncForTest() => await HandleToggleFavoriteAsync();
+
     internal void HandlePosterError()
     {
         var fallback = GetFallbackPosterPath();
@@ -45,6 +49,11 @@ public partial class MovieCard
     }
 
     internal void HandlePosterLoad() => _isPosterLoading = false;
+
+    protected override void OnInitialized()
+    {
+        _favoritesService.FavoritesChanged += HandleFavoritesChanged;
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -68,7 +77,7 @@ public partial class MovieCard
     private string GetPosterUriString(string posterPath) =>
         TMDBClient.GetPosterUri(posterPath).ToString();
 
-    private async Task HandleToggleFavorite()
+    private async Task HandleToggleFavoriteAsync()
     {
         if (IsFavorite)
         {
@@ -78,5 +87,26 @@ public partial class MovieCard
         {
             await _favoritesService.AddFavoriteAsync(Movie);
         }
+
+        await UpdateFavoriteStateAsync();
+    }
+
+    private void HandleFavoritesChanged(object? sender, EventArgs e)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await UpdateFavoriteStateAsync();
+            StateHasChanged();
+        });
+    }
+
+    private async Task UpdateFavoriteStateAsync()
+    {
+        IsFavorite = await _favoritesService.IsFavorite(Movie.Id);
+    }
+
+    public void Dispose()
+    {
+        _favoritesService.FavoritesChanged -= HandleFavoritesChanged;
     }
 }

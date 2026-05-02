@@ -20,6 +20,8 @@ namespace NowPlayingApp.Services
             _logger = logger;
         }
 
+        public event EventHandler? FavoritesChanged;
+
         public async Task AddFavoriteAsync(MovieResponse movie)
         {
             ArgumentNullException.ThrowIfNull(movie);
@@ -29,7 +31,7 @@ namespace NowPlayingApp.Services
             if (current.All(m => m != movie))
             {
                 current.Add(movie);
-                await _localStorageService.SetItemAsync(localStorageKey, current);
+                await SaveFavoritesAsync(current);
             }
         }
 
@@ -64,8 +66,12 @@ namespace NowPlayingApp.Services
             try
             {
                 var current = await GetFavoritesAsync();
-                current = current.Where(m => m.Id != movie.Id).ToList();
-                await SaveFavoritesAsync(current);
+                var updatedFavorites = current.Where(m => m.Id != movie.Id).ToList();
+
+                if (updatedFavorites.Count != current.Count)
+                {
+                    await SaveFavoritesAsync(updatedFavorites);
+                }
             }
             catch (Exception e)
             {
@@ -80,11 +86,14 @@ namespace NowPlayingApp.Services
             try
             {
                 await _localStorageService.SetItemAsync(localStorageKey, movies);
+                NotifyFavoritesChanged();
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error saving favorite movies to local storage.");
             }
         }
+
+        private void NotifyFavoritesChanged() => FavoritesChanged?.Invoke(this, EventArgs.Empty);
     }
 }

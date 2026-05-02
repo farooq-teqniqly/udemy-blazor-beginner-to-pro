@@ -4,6 +4,8 @@ namespace NowPlayingApp.Services
 {
     public interface IFavoritesService
     {
+        event EventHandler? FavoritesChanged;
+
         Task AddFavoriteAsync(MovieResponse movie);
         Task<List<MovieResponse>> GetFavoritesAsync();
         Task<bool> IsFavorite(int movieId);

@@ -13,21 +13,16 @@ public class MovieCardTests
     [Fact]
     public void IsPosterLoading_When_CardRendered_Returns_True()
     {
-        var options = Substitute.For<IOptions<TMDBClientSettings>>();
-        options.Value.Returns(
-            new TMDBClientSettings { TMDBImageBaseAddress = "https://image.tmdb.org/t/p/w500" }
-        );
-        var client = new TMDBClient(new HttpClient(), options);
         var sut = CreateMovieCardWithRemotePoster();
 
         Assert.True(sut.IsPosterLoading);
     }
 
     [Fact]
-    public void IsPosterLoading_When_PosterLoadEventHandled_Returns_False()
+    public async Task IsPosterLoading_When_PosterLoadEventHandled_Returns_False()
     {
         var sut = CreateMovieCardWithRemotePoster();
-        sut.ApplyOnParametersSetForTest();
+        await sut.ApplyOnParametersSetAsyncForTest();
         Assert.True(sut.IsPosterLoading);
 
         sut.HandlePosterLoad();
@@ -36,10 +31,10 @@ public class MovieCardTests
     }
 
     [Fact]
-    public void IsPosterLoading_When_PosterErrorEventHandled_Returns_False()
+    public async Task IsPosterLoading_When_PosterErrorEventHandled_Returns_False()
     {
         var sut = CreateMovieCardWithRemotePoster();
-        sut.ApplyOnParametersSetForTest();
+        await sut.ApplyOnParametersSetAsyncForTest();
         Assert.Equal(
             "https://image.tmdb.org/t/p/w500/9Z2uDYXqJrlmePznQQJhL6d92Rq.jpg",
             sut.PosterImageSrc
@@ -51,7 +46,38 @@ public class MovieCardTests
         Assert.Equal("/images/poster.png", sut.PosterImageSrc);
     }
 
-    private static MovieCard CreateMovieCardWithRemotePoster()
+    [Fact]
+    public async Task IsFavorite_When_AddFavoriteHandled_Returns_True()
+    {
+        var favoritesService = Substitute.For<IFavoritesService>();
+        favoritesService.IsFavorite(42).Returns(false, true);
+        var sut = CreateMovieCardWithRemotePoster(favoritesService, 42);
+        await sut.ApplyOnParametersSetAsyncForTest();
+
+        await sut.HandleToggleFavoriteAsyncForTest();
+
+        Assert.True(sut.IsFavorite);
+        await favoritesService.Received(1).AddFavoriteAsync(Arg.Is<MovieResponse>(m => m.Id == 42));
+    }
+
+    [Fact]
+    public async Task IsFavorite_When_RemoveFavoriteHandled_Returns_False()
+    {
+        var favoritesService = Substitute.For<IFavoritesService>();
+        favoritesService.IsFavorite(42).Returns(true, false);
+        var sut = CreateMovieCardWithRemotePoster(favoritesService, 42);
+        await sut.ApplyOnParametersSetAsyncForTest();
+
+        await sut.HandleToggleFavoriteAsyncForTest();
+
+        Assert.False(sut.IsFavorite);
+        await favoritesService.Received(1).RemoveFavoriteAsync(Arg.Is<MovieResponse>(m => m.Id == 42));
+    }
+
+    private static MovieCard CreateMovieCardWithRemotePoster(
+        IFavoritesService? favoritesService = null,
+        int movieId = 0
+    )
     {
         var options = Substitute.For<IOptions<TMDBClientSettings>>();
 
@@ -60,13 +86,14 @@ public class MovieCardTests
         );
 
         var client = new TMDBClient(new HttpClient(), options);
-        var favoritesService = Substitute.For<IFavoritesService>();
+        var resolvedFavoritesService = favoritesService ?? Substitute.For<IFavoritesService>();
 
-        return new MovieCard(favoritesService)
+        return new MovieCard(resolvedFavoritesService)
         {
             TMDBClient = client,
             Movie = new MovieResponse
             {
+                Id = movieId,
                 Title = "Example Movie",
                 PosterPath = "/9Z2uDYXqJrlmePznQQJhL6d92Rq.jpg",
             },
