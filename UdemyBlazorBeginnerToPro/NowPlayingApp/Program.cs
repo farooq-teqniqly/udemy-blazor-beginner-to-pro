@@ -42,7 +42,7 @@ namespace NowPlayingApp
                 .AddStandardResilienceHandler();
 
             builder.Services.AddScoped<LocalStorageService>();
-            builder.Services.AddScoped<FavoritesService>();
+            builder.Services.AddScoped<IFavoritesService, FavoritesService>();
 
             await builder.Build().RunAsync();
         }

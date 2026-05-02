@@ -60,7 +60,7 @@ public class MovieCardTests
         );
 
         var client = new TMDBClient(new HttpClient(), options);
-        var favoritesService = Substitute.For<FavoritesService>();
+        var favoritesService = Substitute.For<IFavoritesService>();
 
         return new MovieCard(favoritesService)
         {

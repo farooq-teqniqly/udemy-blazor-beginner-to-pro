@@ -1,8 +1,8 @@
-﻿using NowPlayingApp.Models;
+using NowPlayingApp.Models;
 
 namespace NowPlayingApp.Services
 {
-    public class FavoritesService
+    public class FavoritesService : IFavoritesService
     {
         private const string localStorageKey = "favorites";
         private readonly LocalStorageService _localStorageService;
