@@ -88,7 +88,9 @@ public class MovieCardTests
 
         // Assert
         Assert.False(sut.IsFavorite);
-        await favoritesService.Received(1).RemoveFavoriteAsync(Arg.Is<MovieResponse>(m => m.Id == 42));
+        await favoritesService
+            .Received(1)
+            .RemoveFavoriteAsync(Arg.Is<MovieResponse>(m => m.Id == 42));
     }
 
     private static MovieCard CreateMovieCardWithRemotePoster(
@@ -105,8 +107,9 @@ public class MovieCardTests
         var client = new TMDBClient(new HttpClient(), options);
         var resolvedFavoritesService = favoritesService ?? Substitute.For<IFavoritesService>();
 
-        return new MovieCard(resolvedFavoritesService)
+        return new MovieCard
         {
+            FavoritesService = resolvedFavoritesService,
             TMDBClient = client,
             Movie = new MovieResponse
             {

@@ -14,9 +14,12 @@ public class FavoritesTests
         // Arrange
         var favoritesService = Substitute.For<IFavoritesService>();
         var logger = Substitute.For<ILogger<Favorites>>();
-        var initialFavorites = new List<MovieResponse> { new() { Id = 10, Title = "Movie 10" } };
+        var initialFavorites = new List<MovieResponse>
+        {
+            new() { Id = 10, Title = "Movie 10" },
+        };
         favoritesService.GetFavoritesAsync().Returns(initialFavorites);
-        var sut = new Favorites(favoritesService, logger);
+        var sut = new Favorites { FavoritesService = favoritesService, Logger = logger };
 
         // Act
         await sut.LoadFavoritesForTestAsync();
@@ -33,10 +36,13 @@ public class FavoritesTests
         // Arrange
         var favoritesService = Substitute.For<IFavoritesService>();
         var logger = Substitute.For<ILogger<Favorites>>();
-        var firstLoad = new List<MovieResponse> { new() { Id = 10, Title = "Movie 10" } };
+        var firstLoad = new List<MovieResponse>
+        {
+            new() { Id = 10, Title = "Movie 10" },
+        };
         var refreshedLoad = new List<MovieResponse>();
         favoritesService.GetFavoritesAsync().Returns(firstLoad, refreshedLoad);
-        var sut = new Favorites(favoritesService, logger);
+        var sut = new Favorites { FavoritesService = favoritesService, Logger = logger };
 
         // Act
         await sut.LoadFavoritesForTestAsync();

@@ -9,21 +9,14 @@ namespace NowPlayingApp.Components.UI;
 /// </summary>
 public partial class MovieCard : IDisposable
 {
-    private readonly IFavoritesService _favoritesService;
-
     private bool _isPosterLoading = true;
     private string _posterSrc = string.Empty;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MovieCard"/> class.
+    /// Gets or sets the service used to query and update favorite state.
     /// </summary>
-    /// <param name="favoritesService">Service used to query and update favorite state.</param>
-    public MovieCard(IFavoritesService favoritesService)
-    {
-        ArgumentNullException.ThrowIfNull(favoritesService);
-
-        _favoritesService = favoritesService;
-    }
+    [Inject]
+    public IFavoritesService FavoritesService { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets a value indicating whether the current movie is a favorite.
@@ -45,11 +38,17 @@ public partial class MovieCard : IDisposable
 
     internal string PosterImageSrc => _posterSrc;
 
-    internal void ApplyOnParametersSetForTest() => OnParametersSet();
+    /// <summary>
+    /// Unsubscribes from favorites events when the component is disposed.
+    /// </summary>
+    public void Dispose()
+    {
+        FavoritesService.FavoritesChanged -= HandleFavoritesChanged;
+    }
 
     internal async Task ApplyOnParametersSetAsyncForTest() => await OnParametersSetAsync();
 
-    internal async Task HandleToggleFavoriteAsyncForTest() => await HandleToggleFavoriteAsync();
+    internal void ApplyOnParametersSetForTest() => OnParametersSet();
 
     internal void HandlePosterError()
     {
@@ -66,9 +65,11 @@ public partial class MovieCard : IDisposable
 
     internal void HandlePosterLoad() => _isPosterLoading = false;
 
+    internal async Task HandleToggleFavoriteAsyncForTest() => await HandleToggleFavoriteAsync();
+
     protected override void OnInitialized()
     {
-        _favoritesService.FavoritesChanged += HandleFavoritesChanged;
+        FavoritesService.FavoritesChanged += HandleFavoritesChanged;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -80,7 +81,7 @@ public partial class MovieCard : IDisposable
             _isPosterLoading = true;
         }
 
-        IsFavorite = await _favoritesService.IsFavorite(Movie.Id);
+        IsFavorite = await FavoritesService.IsFavorite(Movie.Id);
     }
 
     private string GetFallbackPosterPath() => GetPosterUriString(string.Empty);
@@ -93,20 +94,6 @@ public partial class MovieCard : IDisposable
     private string GetPosterUriString(string posterPath) =>
         TMDBClient.GetPosterUri(posterPath).ToString();
 
-    private async Task HandleToggleFavoriteAsync()
-    {
-        if (IsFavorite)
-        {
-            await _favoritesService.RemoveFavoriteAsync(Movie);
-        }
-        else
-        {
-            await _favoritesService.AddFavoriteAsync(Movie);
-        }
-
-        await UpdateFavoriteStateAsync();
-    }
-
     private void HandleFavoritesChanged(object? sender, EventArgs e)
     {
         _ = InvokeAsync(async () =>
@@ -116,16 +103,22 @@ public partial class MovieCard : IDisposable
         });
     }
 
-    private async Task UpdateFavoriteStateAsync()
+    private async Task HandleToggleFavoriteAsync()
     {
-        IsFavorite = await _favoritesService.IsFavorite(Movie.Id);
+        if (IsFavorite)
+        {
+            await FavoritesService.RemoveFavoriteAsync(Movie);
+        }
+        else
+        {
+            await FavoritesService.AddFavoriteAsync(Movie);
+        }
+
+        await UpdateFavoriteStateAsync();
     }
 
-    /// <summary>
-    /// Unsubscribes from favorites events when the component is disposed.
-    /// </summary>
-    public void Dispose()
+    private async Task UpdateFavoriteStateAsync()
     {
-        _favoritesService.FavoritesChanged -= HandleFavoritesChanged;
+        IsFavorite = await FavoritesService.IsFavorite(Movie.Id);
     }
 }
