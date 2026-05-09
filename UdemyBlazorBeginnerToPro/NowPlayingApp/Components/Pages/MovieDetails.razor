@@ -1,0 +1,16 @@
+﻿@page "/movies/{movieId:int}"
+
+<PageTitle>Now Playing</PageTitle>
+<div>
+    <h1>
+        <i class="bi bi-film text-primary"></i>
+        Movie Details
+    </h1>
+    <p class="lead italic">Details for movie @MovieId</p>
+</div>
+
+@code {
+    [Parameter]
+    public int MovieId { get; set; }
+}
+
