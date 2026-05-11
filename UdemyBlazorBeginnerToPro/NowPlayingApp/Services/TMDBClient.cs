@@ -44,6 +44,24 @@ namespace NowPlayingApp.Services
         }
 
         /// <summary>
+        /// Retrieves detailed information about a specific movie from TMDB.
+        /// </summary>
+        /// <param name="movieId">The unique identifier of the movie.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>A <see cref="MovieDetailResponse"/> containing detailed information about the movie.</returns>
+        /// <exception cref="HttpRequestException">
+        /// Thrown if the HTTP request fails or the response cannot be deserialized.
+        /// </exception>
+        public async Task<MovieDetailResponse> GetMovieDetail(
+            int movieId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var requestUri = $"movie/{movieId}?language=en-US";
+            return await GetAsync<MovieDetailResponse>(requestUri, cancellationToken);
+        }
+
+        /// <summary>
         /// Retrieves movies released within the requested date window sorted by release date.
         /// </summary>
         /// <param name="inLastDays">Number of days back from today to include.</param>
@@ -119,6 +137,31 @@ namespace NowPlayingApp.Services
             return await GetMoviesAsync(requestUri, cancellationToken);
         }
 
+        private async Task<TResponseModel> GetAsync<TResponseModel>(
+            string requestUri,
+            CancellationToken cancellationToken = default
+        )
+        {
+            ArgumentException.ThrowIfNullOrEmpty(requestUri);
+
+            var response = await _http.GetAsync(requestUri, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var responseModel = await response.Content.ReadFromJsonAsync<TResponseModel>(
+                cancellationToken: cancellationToken
+            );
+
+            if (responseModel is null)
+            {
+                throw new HttpRequestException(
+                    $"Could not serialize the response into a {typeof(TResponseModel).Name} instance.",
+                    null,
+                    HttpStatusCode.BadRequest
+                );
+            }
+            return responseModel;
+        }
+
         private async Task<MovieListResponse> GetMovies(
             SortByField sortByField,
             int inLastDays = 14,
@@ -143,22 +186,7 @@ namespace NowPlayingApp.Services
             CancellationToken cancellationToken = default
         )
         {
-            var response = await _http.GetAsync(requestUri, cancellationToken);
-            response.EnsureSuccessStatusCode();
-
-            var movieListResponse = await response.Content.ReadFromJsonAsync<MovieListResponse>(
-                cancellationToken: cancellationToken
-            );
-
-            if (movieListResponse is null)
-            {
-                throw new HttpRequestException(
-                    $"Could not serialize the response into a {nameof(MovieListResponse)} instance.",
-                    null,
-                    HttpStatusCode.BadRequest
-                );
-            }
-            return movieListResponse;
+            return await GetAsync<MovieListResponse>(requestUri, cancellationToken);
         }
     }
 }
