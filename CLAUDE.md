@@ -6,6 +6,10 @@
 - No em dashes. Use regular hyphens.
 - US English spelling and grammar.
 
+## Testing
+
+- Prefer data-driven tests over individual tests when testing multiple inputs or variations of the same behavior. Use `[Theory]` with `[InlineData]`, `[MemberData]`, or `[ClassData]` (xUnit) rather than multiple `[Fact]` methods that differ only in their inputs.
+
 ## Naming Conventions
 
 Sources: [.NET Framework Design Guidelines](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/naming-guidelines) and [ASP.NET Core Engineering Guidelines](https://github.com/dotnet/aspnetcore/wiki/Engineering-guidelines#coding-guidelines). Where these conflict, ASP.NET Core guidelines take precedence.
