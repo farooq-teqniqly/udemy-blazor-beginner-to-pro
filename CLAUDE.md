@@ -6,6 +6,13 @@
 - No em dashes. Use regular hyphens.
 - US English spelling and grammar.
 
+## Documentation
+
+- All public and internal classes, methods, and properties must have XML doc comments (`/// <summary>`).
+- Use complete sentences ending with a period.
+- Do not restate the identifier name verbatim - describe behavior, purpose, or contract.
+- Document parameters (`<param>`), return values (`<returns>`), and exceptions (`<exception>`) when they add information beyond what the signature already conveys.
+
 ## Testing
 
 - Prefer data-driven tests over individual tests when testing multiple inputs or variations of the same behavior. Use `[Theory]` with `[InlineData]`, `[MemberData]`, or `[ClassData]` (xUnit) rather than multiple `[Fact]` methods that differ only in their inputs.
