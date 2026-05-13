@@ -1,6 +1,4 @@
 ﻿@page "/movies/{movieId:int}"
-@inject TMDBClient TMDBClient
-@inject ILogger<MovieDetails> Logger
 
 @if (_movieDetailResponse is not null)
 {
@@ -70,77 +68,4 @@
         </div>
     }
 </div>
-
-
-@code {
-    private CancellationTokenSource? _cancellationTokenSource;
-    private MovieDetailResponse? _movieDetailResponse;
-    private bool _isPosterLoading = true;
-    private string _posterSrc = string.Empty;
-    private bool _isBackdropLoading = true;
-    private string _backdropSrc = string.Empty;
-    private bool _isPageLoading;
-
-    [Parameter]
-    public int MovieId { get; set; }
-
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _cancellationTokenSource = new CancellationTokenSource();
-        _isPageLoading = true;
-
-        try
-        {
-            _movieDetailResponse = await TMDBClient.GetMovieDetail(MovieId);
-
-            var newBackdropSrc = GetBackdropUriString(_movieDetailResponse.BackdropPath);
-            var newPosterSrc = GetPosterUriString(_movieDetailResponse.PosterPath);
-
-            if (!string.Equals(newBackdropSrc, _backdropSrc, StringComparison.Ordinal))
-            {
-                _backdropSrc = newBackdropSrc;
-                _isBackdropLoading = true;
-            }
-
-            if (!string.Equals(newPosterSrc, _posterSrc, StringComparison.Ordinal))
-            {
-                _posterSrc = newPosterSrc;
-                _isPosterLoading = true;
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            Logger.LogDebug($"{nameof(TMDBClient.GetMovieDetail)} request was cancelled.");
-        }
-        catch (HttpRequestException httpRequestException)
-        {
-            Logger.LogError(httpRequestException, $"{nameof(TMDBClient.GetMovieDetail)} - an error occurred.");
-        }
-        finally
-        {
-            _isPageLoading = false;
-        }
-
-
-    }
-
-    public void Dispose()
-    {
-        _cancellationTokenSource?.Cancel();
-        _cancellationTokenSource?.Dispose();
-    }
-
-    private void HandlePosterLoad() => _isPosterLoading = false;
-    private void HandlePosterError() => _isPosterLoading = false;
-    private void HandleBackdropLoad() => _isBackdropLoading = false;
-    private void HandleBackdropError() => _isBackdropLoading = false;
-
-    private string GetBackdropUriString(string backdropPath) =>
-        TMDBClient.GetBackdropUri(backdropPath).ToString();
-
-    private string GetPosterUriString(string posterPath) =>
-        TMDBClient.GetPosterUri(posterPath).ToString();
-
-}
 
