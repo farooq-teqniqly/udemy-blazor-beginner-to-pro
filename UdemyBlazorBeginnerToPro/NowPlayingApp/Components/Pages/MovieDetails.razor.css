@@ -8,11 +8,37 @@
     backdrop-filter: blur(2px);
 }
 
+.movie-poster-wrapper {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    max-width: 300px;
+    width: 100%;
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.movie-poster__spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.movie-poster__image--loading {
+    visibility: hidden;
+}
+
 #movie-poster {
+    position: absolute;
+    inset: 0;
     border-radius: 15px;
     border-color: rgba(255, 255, 255, 0.6);
     border-width: 1px;
-    max-width: 300px;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
 }

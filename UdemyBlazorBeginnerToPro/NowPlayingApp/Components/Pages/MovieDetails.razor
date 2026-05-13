@@ -24,12 +24,21 @@
     }
     else
     {
-        <div id="movie-details" style="--background: url(@_backdropSrc)">
+        <div id="movie-details" style="@(_isBackdropLoading ? null : $"--background: url({_backdropSrc})")">
+            <img src="@_backdropSrc" alt="" aria-hidden="true" style="display:none" @onload="HandleBackdropLoad" @onerror="HandleBackdropError" />
             <div id="movie-wrapper">
                 <div class="container-xxl py-3">
                     <div class="row">
                         <div class="col-12 col-md-4 col-xl-3 text-center text-md-start mb-3">
-                            <img id="movie-poster" alt="Movie Poster" class="img-fluid" src="@_posterSrc" />
+                            <div class="movie-poster-wrapper" aria-busy="@_isPosterLoading">
+                                @if (_isPosterLoading)
+                                {
+                                    <div class="movie-poster__spinner" aria-hidden="true">
+                                        <LoadingSpinner Label="Loading poster" />
+                                    </div>
+                                }
+                                <img id="movie-poster" alt="Movie Poster" class="@(_isPosterLoading ? "movie-poster__image--loading" : null)" src="@_posterSrc" @onload="HandlePosterLoad" @onerror="HandlePosterError" />
+                            </div>
                         </div>
                         <div class="col-12 col-md-8 col-xl-9">
                             <h3 class="display-6 fw-bold mb-0">@_movieDetailResponse.Title</h3>
@@ -50,7 +59,7 @@
                                 <span id="movie-rating">
                                     User score: @ToPercentString(_movieDetailResponse.VoteAverage)
                                 </span>
-                                <br/>
+                                <br />
                                 <span>
                                     @FormatUserVotesString(_movieDetailResponse.VoteCount) user votes
                                 </span>
@@ -112,8 +121,6 @@
         finally
         {
             _isPageLoading = false;
-            _isPosterLoading = false;
-            _isPosterLoading = false;
         }
 
 
@@ -124,6 +131,11 @@
         _cancellationTokenSource?.Cancel();
         _cancellationTokenSource?.Dispose();
     }
+
+    private void HandlePosterLoad() => _isPosterLoading = false;
+    private void HandlePosterError() => _isPosterLoading = false;
+    private void HandleBackdropLoad() => _isBackdropLoading = false;
+    private void HandleBackdropError() => _isBackdropLoading = false;
 
     private string GetBackdropUriString(string backdropPath) =>
         TMDBClient.GetBackdropUri(backdropPath).ToString();
