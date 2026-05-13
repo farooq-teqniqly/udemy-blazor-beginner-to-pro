@@ -44,6 +44,16 @@ namespace NowPlayingApp.Services
         }
 
         /// <summary>
+        /// Builds a backdrop image URI for a TMDB backdrop image path or returns the local fallback backdrop image.
+        /// </summary>
+        /// <param name="backdropPath">Backdrop image path returned by TMDB.</param>
+        /// <returns>An absolute TMDB image URI or a relative fallback URI.</returns>
+        public Uri GetBackdropUri(string backdropPath)
+        {
+            return GetImageUri(backdropPath, "backdrop.jpg");
+        }
+
+        /// <summary>
         /// Retrieves detailed information about a specific movie from TMDB.
         /// </summary>
         /// <param name="movieId">The unique identifier of the movie.</param>
@@ -96,18 +106,7 @@ namespace NowPlayingApp.Services
         /// <returns>An absolute TMDB image URI or a relative fallback URI.</returns>
         public Uri GetPosterUri(string posterPath)
         {
-            ArgumentException.ThrowIfNullOrEmpty(_settings.TMDBImageBaseAddress);
-
-            if (string.IsNullOrEmpty(posterPath))
-            {
-                return new Uri("/images/poster.png", UriKind.Relative);
-            }
-
-            // TMDB poster paths often start with '/'. new Uri(base, "/x.jpg") replaces the base path
-            // with an absolute-on-host path; normalize so /t/p/w500 is preserved.
-            var baseUri = new Uri(_settings.TMDBImageBaseAddress.TrimEnd('/') + "/");
-            var relativePath = posterPath.TrimStart('/');
-            return new Uri(baseUri, relativePath);
+            return GetImageUri(posterPath, "poster.png");
         }
 
         /// <summary>
@@ -160,6 +159,23 @@ namespace NowPlayingApp.Services
                 );
             }
             return responseModel;
+        }
+
+        private Uri GetImageUri(string imagePath, string fallbackImagePath)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(fallbackImagePath);
+            ArgumentException.ThrowIfNullOrEmpty(_settings.TMDBImageBaseAddress);
+
+            if (string.IsNullOrEmpty(imagePath))
+            {
+                return new Uri($"/images/{fallbackImagePath}", UriKind.Relative);
+            }
+
+            // TMDB poster paths often start with '/'. new Uri(base, "/x.jpg") replaces the base path
+            // with an absolute-on-host path; normalize so /t/p/w500 is preserved.
+            var baseUri = new Uri(_settings.TMDBImageBaseAddress.TrimEnd('/') + "/");
+            var relativePath = imagePath.TrimStart('/');
+            return new Uri(baseUri, relativePath);
         }
 
         private async Task<MovieListResponse> GetMovies(

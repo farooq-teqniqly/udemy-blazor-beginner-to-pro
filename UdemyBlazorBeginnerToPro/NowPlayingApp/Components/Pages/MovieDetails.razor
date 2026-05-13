@@ -1,16 +1,179 @@
 ﻿@page "/movies/{movieId:int}"
+@using System.Text
+@inject TMDBClient TMDBClient
+@inject ILogger<MovieDetails> Logger
 
-<PageTitle>Now Playing</PageTitle>
-<div>
-    <h1>
-        <i class="bi bi-film text-primary"></i>
-        Movie Details
-    </h1>
-    <p class="lead italic">Details for movie @MovieId</p>
+@if (_movieDetailResponse is not null)
+{
+    <PageTitle>@_movieDetailResponse.Title</PageTitle>
+}
+
+<div class="container-fluid p-0">
+    @if (_movieDetailResponse is null)
+    {
+        <div class="d-flex justify-content-center align-items-center">
+            @if (_isPageLoading)
+            {
+                <h2>Loading movie details...</h2>
+            }
+            else
+            {
+                <h2 class="text-muted">Failed to load movie details.</h2>
+            }
+        </div>
+    }
+    else
+    {
+        <div id="movie-details" style="--background: url(@_backdropSrc)">
+            <div id="movie-wrapper">
+                <div class="container-xxl py-3">
+                    <div class="row">
+                        <div class="col-12 col-md-4 col-xl-3 text-center text-md-start mb-3">
+                            <img id="movie-poster" alt="Movie Poster" class="img-fluid" src="@_posterSrc" />
+                        </div>
+                        <div class="col-12 col-md-8 col-xl-9">
+                            <h3 class="display-6 fw-bold mb-0">@_movieDetailResponse.Title</h3>
+                            <div class="lead">@_movieDetailResponse.Tagline</div>
+                            <div class="hstack gap-2">
+                                <span>@FormatDateString(_movieDetailResponse.ReleaseDate) | </span>
+                                <span>@GetRuntimeString(_movieDetailResponse.Runtime)</span>
+                            </div>
+                            <div class="hstack gap-2 my-2">
+                                @foreach (var genre in _movieDetailResponse.Genres)
+                                {
+                                    <span class="badge text-bg-primary">@genre.Name</span>
+                                }
+                            </div>
+                            <h5 class="lead fw-bold pt-3 mt-3">Overview</h5>
+                            <p>@_movieDetailResponse.Overview</p>
+                            <div>
+                                <span id="movie-rating">
+                                    User score: @ToPercentString(_movieDetailResponse.VoteAverage)
+                                </span>
+                                <br/>
+                                <span>
+                                    @FormatUserVotesString(_movieDetailResponse.VoteCount) user votes
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
+
 @code {
+    private CancellationTokenSource? _cancellationTokenSource;
+    private MovieDetailResponse? _movieDetailResponse;
+    private bool _isPosterLoading = true;
+    private string _posterSrc = string.Empty;
+    private bool _isBackdropLoading = true;
+    private string _backdropSrc = string.Empty;
+    private bool _isPageLoading;
+
     [Parameter]
     public int MovieId { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        _isPageLoading = true;
+
+        try
+        {
+            _movieDetailResponse = await TMDBClient.GetMovieDetail(MovieId);
+
+            var newBackdropSrc = GetBackdropUriString(_movieDetailResponse.BackdropPath);
+            var newPosterSrc = GetPosterUriString(_movieDetailResponse.PosterPath);
+
+            if (!string.Equals(newBackdropSrc, _backdropSrc, StringComparison.Ordinal))
+            {
+                _backdropSrc = newBackdropSrc;
+                _isBackdropLoading = true;
+            }
+
+            if (!string.Equals(newPosterSrc, _posterSrc, StringComparison.Ordinal))
+            {
+                _posterSrc = newPosterSrc;
+                _isPosterLoading = true;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.LogDebug($"{nameof(TMDBClient.GetMovieDetail)} request was cancelled.");
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Logger.LogError(httpRequestException, $"{nameof(TMDBClient.GetMovieDetail)} - an error occurred.");
+        }
+        finally
+        {
+            _isPageLoading = false;
+            _isPosterLoading = false;
+            _isPosterLoading = false;
+        }
+
+
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+    }
+
+    private string GetBackdropUriString(string backdropPath) =>
+        TMDBClient.GetBackdropUri(backdropPath).ToString();
+
+    private string GetPosterUriString(string posterPath) =>
+        TMDBClient.GetPosterUri(posterPath).ToString();
+
+    private string FormatDateString(string date)
+    {
+        var parsed = DateTime.TryParse(date, out var parsedDate);
+        return parsed ? parsedDate.ToString("MMMM dd, yyyy") : string.Empty;
+    }
+
+    private string GetRuntimeString(int duration)
+    {
+        var hours = duration / 60;
+        var minutes = duration % 60;
+
+        var sb = new StringBuilder();
+
+        if (hours > 0)
+        {
+            sb = sb.Append(hours);
+            sb = sb.Append(hours == 1 ? " hour " : " hours ");
+        }
+
+        if (minutes > 0)
+        {
+            sb.Append(minutes);
+            sb = sb.Append(minutes == 1 ? " minute" : " minutes");
+        }
+
+        return sb.ToString();
+    }
+
+    private string ToPercentString(float voteAverage)
+    {
+        return $"{(voteAverage * 10):F0}%";
+    }
+
+    private string FormatUserVotesString(int voteCount)
+    {
+        if (voteCount <= 1000)
+        {
+            return voteCount.ToString("N0");
+        }
+
+        var roundedVoteCount = (int)Math.Round(voteCount / 1000.0) * 1000;
+        return $"{roundedVoteCount / 1000}K";
+    }
+
 }
 
