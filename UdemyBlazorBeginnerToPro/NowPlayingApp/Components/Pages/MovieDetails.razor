@@ -1,5 +1,4 @@
 ﻿@page "/movies/{movieId:int}"
-@using System.Text
 @inject TMDBClient TMDBClient
 @inject ILogger<MovieDetails> Logger
 
@@ -44,8 +43,8 @@
                             <h3 class="display-6 fw-bold mb-0">@_movieDetailResponse.Title</h3>
                             <div class="lead">@_movieDetailResponse.Tagline</div>
                             <div class="hstack gap-2">
-                                <span>@FormatDateString(_movieDetailResponse.ReleaseDate) | </span>
-                                <span>@GetRuntimeString(_movieDetailResponse.Runtime)</span>
+                                <span>@MovieDetailsFormatter.FormatDateString(_movieDetailResponse.ReleaseDate) | </span>
+                                <span>@MovieDetailsFormatter.GetRuntimeString(_movieDetailResponse.Runtime)</span>
                             </div>
                             <div class="hstack gap-2 my-2">
                                 @foreach (var genre in _movieDetailResponse.Genres)
@@ -57,11 +56,11 @@
                             <p>@_movieDetailResponse.Overview</p>
                             <div>
                                 <span id="movie-rating">
-                                    User score: @ToPercentString(_movieDetailResponse.VoteAverage)
+                                    User score: @MovieDetailsFormatter.ToPercentString(_movieDetailResponse.VoteAverage)
                                 </span>
                                 <br />
                                 <span>
-                                    @FormatUserVotesString(_movieDetailResponse.VoteCount) user votes
+                                    @MovieDetailsFormatter.FormatUserVotesString(_movieDetailResponse.VoteCount) user votes
                                 </span>
                             </div>
                         </div>
@@ -142,50 +141,6 @@
 
     private string GetPosterUriString(string posterPath) =>
         TMDBClient.GetPosterUri(posterPath).ToString();
-
-    private string FormatDateString(string date)
-    {
-        var parsed = DateTime.TryParse(date, out var parsedDate);
-        return parsed ? parsedDate.ToString("MMMM dd, yyyy") : string.Empty;
-    }
-
-    private string GetRuntimeString(int duration)
-    {
-        var hours = duration / 60;
-        var minutes = duration % 60;
-
-        var sb = new StringBuilder();
-
-        if (hours > 0)
-        {
-            sb = sb.Append(hours);
-            sb = sb.Append(hours == 1 ? " hour " : " hours ");
-        }
-
-        if (minutes > 0)
-        {
-            sb.Append(minutes);
-            sb = sb.Append(minutes == 1 ? " minute" : " minutes");
-        }
-
-        return sb.ToString();
-    }
-
-    private string ToPercentString(float voteAverage)
-    {
-        return $"{(voteAverage * 10):F0}%";
-    }
-
-    private string FormatUserVotesString(int voteCount)
-    {
-        if (voteCount <= 1000)
-        {
-            return voteCount.ToString("N0");
-        }
-
-        var roundedVoteCount = (int)Math.Round(voteCount / 1000.0) * 1000;
-        return $"{roundedVoteCount / 1000}K";
-    }
 
 }
 
