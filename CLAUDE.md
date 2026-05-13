@@ -9,6 +9,7 @@
 ## Testing
 
 - Prefer data-driven tests over individual tests when testing multiple inputs or variations of the same behavior. Use `[Theory]` with `[InlineData]`, `[MemberData]`, or `[ClassData]` (xUnit) rather than multiple `[Fact]` methods that differ only in their inputs.
+- All test methods must have Arrange/Act/Assert comments. Use `// Arrange`, `// Act`, `// Assert` as separate sections. Use `// Act & Assert` when the act and assert cannot be separated (e.g., `Assert.Throws`, single-line `[Theory]` bodies, no-throw checks). Omit `// Arrange` only when there is no local setup (e.g., shared static test data at class level).
 
 ## Naming Conventions
 
