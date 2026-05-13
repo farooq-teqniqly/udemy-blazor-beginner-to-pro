@@ -24,6 +24,6 @@
         <button class="btn btn-outline-primary" @onclick="HandleToggleFavoriteAsync">
             @(IsFavorite ? "Remove favorite" : "Add favorite")
         </button>
-        <a href="moviedetail" class="btn btn-primary">More info</a>
+        <a href="movies/@Movie?.Id" class="btn btn-primary">More info</a>
     </div>
 </div>

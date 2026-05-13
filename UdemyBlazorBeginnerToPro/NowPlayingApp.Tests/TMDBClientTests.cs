@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using Microsoft.Extensions.Options;
+using NowPlayingApp.Models;
 using NowPlayingApp.Services;
 using NSubstitute;
 
@@ -9,45 +10,7 @@ namespace NowPlayingApp.Tests;
 public class TMDBClientTests
 {
     [Fact]
-    public async Task SearchMovies_When_QueryProvided_CallsSearchEndpointAndReturnsResults()
-    {
-        // Arrange
-        const string query = "batman";
-        var handler = new StubHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(
-                """
-                {
-                    "page": 1,
-                    "results": [
-                        { "id": 42, "title": "Batman Begins", "release_date": "2005-06-15", "poster_path": "/abc.jpg" }
-                    ],
-                    "total_pages": 1,
-                    "total_results": 1
-                }
-                """,
-                Encoding.UTF8,
-                "application/json"
-            ),
-        });
-
-        var sut = CreateSut(handler);
-
-        // Act
-        var result = await sut.SearchMovies(query);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Single(result.Results);
-        Assert.Equal(42, result.Results[0].Id);
-        Assert.Equal(
-            "/3/search/movie?query=batman&include_adult=false&language=en-US&page=1",
-            handler.RequestedUri?.PathAndQuery
-        );
-    }
-
-    [Fact]
-    public async Task SearchMovies_When_ResponseBodyIsNull_ThrowsHttpRequestException()
+    public async Task GetMovieDetail_When_ResponseBodyIsNull_ThrowsHttpRequestExceptionWithModelTypeName()
     {
         // Arrange
         var handler = new StubHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
@@ -57,25 +20,12 @@ public class TMDBClientTests
         var sut = CreateSut(handler);
 
         // Act
-        var action = async () => await sut.SearchMovies("inception");
-
-        // Assert
-        await Assert.ThrowsAsync<HttpRequestException>(action);
-    }
-
-    [Fact]
-    public async Task SearchMovies_When_QueryEmpty_ThrowsArgumentException()
-    {
-        // Arrange
-        var sut = CreateSut(
-            new StubHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))
+        var exception = await Assert.ThrowsAsync<HttpRequestException>(
+            () => sut.GetMovieDetail(931285)
         );
 
-        // Act
-        var action = async () => await sut.SearchMovies(string.Empty);
-
         // Assert
-        await Assert.ThrowsAsync<ArgumentException>(action);
+        Assert.Contains(nameof(MovieDetailResponse), exception.Message);
     }
 
     [Fact]
@@ -129,6 +79,76 @@ public class TMDBClientTests
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => sut.GetPosterUri("/poster.jpg"));
+    }
+
+    [Fact]
+    public async Task SearchMovies_When_QueryEmpty_ThrowsArgumentException()
+    {
+        // Arrange
+        var sut = CreateSut(
+            new StubHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))
+        );
+
+        // Act
+        var action = async () => await sut.SearchMovies(string.Empty);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentException>(action);
+    }
+
+    [Fact]
+    public async Task SearchMovies_When_QueryProvided_CallsSearchEndpointAndReturnsResults()
+    {
+        // Arrange
+        const string query = "batman";
+        var handler = new StubHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                """
+                {
+                    "page": 1,
+                    "results": [
+                        { "id": 42, "title": "Batman Begins", "release_date": "2005-06-15", "poster_path": "/abc.jpg" }
+                    ],
+                    "total_pages": 1,
+                    "total_results": 1
+                }
+                """,
+                Encoding.UTF8,
+                "application/json"
+            ),
+        });
+
+        var sut = CreateSut(handler);
+
+        // Act
+        var result = await sut.SearchMovies(query);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single(result.Results);
+        Assert.Equal(42, result.Results[0].Id);
+        Assert.Equal(
+            "/3/search/movie?query=batman&include_adult=false&language=en-US&page=1",
+            handler.RequestedUri?.PathAndQuery
+        );
+    }
+
+    [Fact]
+    public async Task SearchMovies_When_ResponseBodyIsNull_ThrowsHttpRequestException()
+    {
+        // Arrange
+        var handler = new StubHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("null", Encoding.UTF8, "application/json"),
+        });
+        var sut = CreateSut(handler);
+
+        // Act
+        var action = async () => await sut.SearchMovies("inception");
+
+        // Assert
+        await Assert.ThrowsAsync<HttpRequestException>(action);
     }
 
     private static TMDBClient CreateSut(HttpMessageHandler handler)

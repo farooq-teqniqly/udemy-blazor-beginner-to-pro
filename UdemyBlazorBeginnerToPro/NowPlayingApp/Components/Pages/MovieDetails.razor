@@ -1,0 +1,71 @@
+﻿@page "/movies/{movieId:int}"
+
+@if (_movieDetailResponse is not null)
+{
+    <PageTitle>@_movieDetailResponse.Title</PageTitle>
+}
+
+<div class="container-fluid p-0">
+    @if (_movieDetailResponse is null)
+    {
+        <div class="d-flex justify-content-center align-items-center">
+            @if (_isPageLoading)
+            {
+                <h2>Loading movie details...</h2>
+            }
+            else
+            {
+                <h2 class="text-muted">Failed to load movie details.</h2>
+            }
+        </div>
+    }
+    else
+    {
+        <div id="movie-details" style="@(_isBackdropLoading ? null : $"--background: url({_backdropSrc})")">
+            <img src="@_backdropSrc" alt="" aria-hidden="true" style="display:none" @onload="HandleBackdropLoad" @onerror="HandleBackdropError" />
+            <div id="movie-wrapper">
+                <div class="container-xxl py-3">
+                    <div class="row">
+                        <div class="col-12 col-md-4 col-xl-3 text-center text-md-start mb-3">
+                            <div class="movie-poster-wrapper" aria-busy="@_isPosterLoading">
+                                @if (_isPosterLoading)
+                                {
+                                    <div class="movie-poster__spinner" aria-hidden="true">
+                                        <LoadingSpinner Label="Loading poster" />
+                                    </div>
+                                }
+                                <img id="movie-poster" alt="Movie Poster" class="@(_isPosterLoading ? "movie-poster__image--loading" : null)" src="@_posterSrc" @onload="HandlePosterLoad" @onerror="HandlePosterError" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-8 col-xl-9">
+                            <h3 class="display-6 fw-bold mb-0">@_movieDetailResponse.Title</h3>
+                            <div class="lead">@_movieDetailResponse.Tagline</div>
+                            <div class="hstack gap-2">
+                                <span>@MovieDetailsFormatter.FormatDateString(_movieDetailResponse.ReleaseDate) | </span>
+                                <span>@MovieDetailsFormatter.GetRuntimeString(_movieDetailResponse.Runtime)</span>
+                            </div>
+                            <div class="hstack gap-2 my-2">
+                                @foreach (var genre in _movieDetailResponse.Genres)
+                                {
+                                    <span class="badge text-bg-primary">@genre.Name</span>
+                                }
+                            </div>
+                            <h5 class="lead fw-bold pt-3 mt-3">Overview</h5>
+                            <p>@_movieDetailResponse.Overview</p>
+                            <div>
+                                <span id="movie-rating">
+                                    User score: @MovieDetailsFormatter.ToPercentString(_movieDetailResponse.VoteAverage)
+                                </span>
+                                <br />
+                                <span>
+                                    @MovieDetailsFormatter.FormatUserVotesString(_movieDetailResponse.VoteCount) user votes
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
