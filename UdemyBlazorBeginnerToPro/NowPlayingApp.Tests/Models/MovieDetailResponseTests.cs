@@ -55,10 +55,13 @@ public class MovieDetailResponseTests
     [Fact]
     public void Deserialize_When_BelongsToCollectionIsNull_MapsToNull()
     {
+        // Arrange
         const string json = """{ "id": 1, "title": "Test", "belongs_to_collection": null }""";
 
+        // Act
         var sut = JsonSerializer.Deserialize<MovieDetailResponse>(json);
 
+        // Assert
         Assert.NotNull(sut);
         Assert.Null(sut.BelongsToCollection);
     }
@@ -66,8 +69,10 @@ public class MovieDetailResponseTests
     [Fact]
     public void Deserialize_When_FullJson_MapsBelongsToCollection()
     {
+        // Act
         var sut = JsonSerializer.Deserialize<MovieDetailResponse>(Json);
 
+        // Assert
         Assert.NotNull(sut?.BelongsToCollection);
         Assert.Equal(931431, sut.BelongsToCollection.Id);
         Assert.Equal("Mortal Kombat (Reboot) Collection", sut.BelongsToCollection.Name);
@@ -78,8 +83,10 @@ public class MovieDetailResponseTests
     [Fact]
     public void Deserialize_When_FullJson_MapsGenres()
     {
+        // Act
         var sut = JsonSerializer.Deserialize<MovieDetailResponse>(Json);
 
+        // Assert
         Assert.NotNull(sut);
         Assert.Equal(3, sut.Genres.Count);
         Assert.Equal(28, sut.Genres[0].Id);
@@ -93,8 +100,10 @@ public class MovieDetailResponseTests
     [Fact]
     public void Deserialize_When_FullJson_MapsProductionCompanies()
     {
+        // Act
         var sut = JsonSerializer.Deserialize<MovieDetailResponse>(Json);
 
+        // Assert
         Assert.NotNull(sut);
         Assert.Equal(2, sut.ProductionCompanies.Count);
         Assert.Equal(12, sut.ProductionCompanies[0].Id);
@@ -106,8 +115,10 @@ public class MovieDetailResponseTests
     [Fact]
     public void Deserialize_When_FullJson_MapsProductionCountries()
     {
+        // Act
         var sut = JsonSerializer.Deserialize<MovieDetailResponse>(Json);
 
+        // Assert
         Assert.NotNull(sut);
         Assert.Single(sut.ProductionCountries);
         Assert.Equal("US", sut.ProductionCountries[0].Iso31661);
@@ -117,8 +128,10 @@ public class MovieDetailResponseTests
     [Fact]
     public void Deserialize_When_FullJson_MapsSpokenLanguages()
     {
+        // Act
         var sut = JsonSerializer.Deserialize<MovieDetailResponse>(Json);
 
+        // Assert
         Assert.NotNull(sut);
         Assert.Single(sut.SpokenLanguages);
         Assert.Equal("English", sut.SpokenLanguages[0].EnglishName);
@@ -129,8 +142,10 @@ public class MovieDetailResponseTests
     [Fact]
     public void Deserialize_When_FullJson_MapsTopLevelProperties()
     {
+        // Act
         var sut = JsonSerializer.Deserialize<MovieDetailResponse>(Json);
 
+        // Assert
         Assert.NotNull(sut);
         Assert.False(sut.Adult);
         Assert.Equal("/qjv21Iu0nHQ0crJpy6KKiW8LX1Y.jpg", sut.BackdropPath);
@@ -158,8 +173,10 @@ public class MovieDetailResponseTests
     [Fact]
     public void Deserialize_When_ProductionCompanyLogoPathIsNull_MapsToNull()
     {
+        // Act
         var sut = JsonSerializer.Deserialize<MovieDetailResponse>(Json);
 
+        // Assert
         Assert.NotNull(sut);
         var company = sut.ProductionCompanies.Single(c => c.Id == 252367);
         Assert.Null(company.LogoPath);

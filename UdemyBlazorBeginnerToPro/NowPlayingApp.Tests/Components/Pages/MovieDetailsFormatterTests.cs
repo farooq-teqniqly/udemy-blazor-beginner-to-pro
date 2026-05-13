@@ -11,6 +11,7 @@ public class MovieDetailsFormatterTests
     [InlineData("", "")]
     public void FormatDateString_Returns_ExpectedString(string input, string expected)
     {
+        // Act & Assert
         Assert.Equal(expected, MovieDetailsFormatter.FormatDateString(input));
     }
 
@@ -24,6 +25,7 @@ public class MovieDetailsFormatterTests
     [InlineData(10000, "10K")]
     public void FormatUserVotesString_Returns_ExpectedString(int voteCount, string expected)
     {
+        // Act & Assert
         Assert.Equal(expected, MovieDetailsFormatter.FormatUserVotesString(voteCount));
     }
 
@@ -39,6 +41,7 @@ public class MovieDetailsFormatterTests
     [InlineData(121, "2 hours 1 minute")]
     public void GetRuntimeString_Returns_ExpectedString(int duration, string expected)
     {
+        // Act & Assert
         Assert.Equal(expected, MovieDetailsFormatter.GetRuntimeString(duration));
     }
 
@@ -49,6 +52,7 @@ public class MovieDetailsFormatterTests
     [InlineData(10.0f, "100%")]
     public void ToPercentString_Returns_ExpectedString(float voteAverage, string expected)
     {
+        // Act & Assert
         Assert.Equal(expected, MovieDetailsFormatter.ToPercentString(voteAverage));
     }
 }
