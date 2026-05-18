@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using NowPlayingApp.Models;
 using NowPlayingApp.Services;
 
@@ -13,9 +14,13 @@ public partial class MovieDetails : IDisposable
     private bool _isPosterLoading = true;
     private MovieDetailResponse? _movieDetailResponse;
     private string _posterSrc = string.Empty;
+    private MovieVideo? _trailer;
 
     [Inject]
     public ILogger<MovieDetails> Logger { get; set; } = null!;
+
+    [Inject]
+    public IJSRuntime JsRuntime { get; set; } = null!;
 
     [Parameter]
     public int MovieId { get; set; }
@@ -52,7 +57,10 @@ public partial class MovieDetails : IDisposable
 
         try
         {
-            _movieDetailResponse = await TMDBClient.GetMovieDetail(MovieId);
+            _movieDetailResponse = await TMDBClient.GetMovieDetail(
+                MovieId,
+                _cancellationTokenSource.Token
+            );
 
             var newBackdropSrc = GetBackdropUriString(_movieDetailResponse.BackdropPath);
             var newPosterSrc = GetPosterUriString(_movieDetailResponse.PosterPath);
@@ -84,11 +92,52 @@ public partial class MovieDetails : IDisposable
         {
             _isPageLoading = false;
         }
+
+        try
+        {
+            _trailer = await TMDBClient.GetTrailer(MovieId, _cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.LogDebug($"{nameof(TMDBClient.GetTrailer)} request was cancelled.");
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Logger.LogError(
+                httpRequestException,
+                $"{nameof(TMDBClient.GetTrailer)} - an error occurred."
+            );
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./Components/Pages/MovieDetails.razor.js"
+        );
+
+        await using (jsModule)
+        {
+            if (HasTrailer())
+            {
+                var ytTrailerUrl = $"https://www.youtube.com/embed/{_trailer!.Key}";
+                await jsModule.InvokeVoidAsync("initVideoPlayer", ytTrailerUrl);
+            }
+            else
+            {
+                await jsModule.InvokeVoidAsync("initVideoPlayer", string.Empty);
+            }
+        }
     }
 
     private string GetBackdropUriString(string backdropPath) =>
         TMDBClient.GetBackdropUri(backdropPath).ToString();
 
+    private string GetModalTitle() => _movieDetailResponse?.Title ?? "Movie trailer";
+
     private string GetPosterUriString(string posterPath) =>
         TMDBClient.GetPosterUri(posterPath).ToString();
+
+    private bool HasTrailer() => _trailer is not null && !string.IsNullOrEmpty(_trailer.Key);
 }
