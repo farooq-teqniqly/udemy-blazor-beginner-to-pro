@@ -58,39 +58,29 @@ public partial class MovieDetails : IDisposable
     protected override async Task OnParametersSetAsync()
     {
         _cancellationTokenSource = new CancellationTokenSource();
+        var token = _cancellationTokenSource.Token;
         _isPageLoading = true;
+
+        var trailerTask = TMDBClient.GetTrailer(MovieId, token);
 
         try
         {
-            _movieDetailResponse = await TMDBClient.GetMovieDetail(
-                MovieId,
-                _cancellationTokenSource.Token
-            );
-
-            var newBackdropSrc = GetBackdropUriString(_movieDetailResponse.BackdropPath);
-            var newPosterSrc = GetPosterUriString(_movieDetailResponse.PosterPath);
-
-            if (!string.Equals(newBackdropSrc, _backdropSrc, StringComparison.Ordinal))
-            {
-                _backdropSrc = newBackdropSrc;
-                _isBackdropLoading = true;
-            }
-
-            if (!string.Equals(newPosterSrc, _posterSrc, StringComparison.Ordinal))
-            {
-                _posterSrc = newPosterSrc;
-                _isPosterLoading = true;
-            }
+            _movieDetailResponse = await TMDBClient.GetMovieDetail(MovieId, token);
+            UpdateImageSources();
         }
         catch (OperationCanceledException)
         {
-            Logger.LogDebug($"{nameof(TMDBClient.GetMovieDetail)} request was cancelled.");
+            Logger.LogDebug(
+                "{Operation} request was cancelled.",
+                nameof(TMDBClient.GetMovieDetail)
+            );
         }
-        catch (HttpRequestException httpRequestException)
+        catch (HttpRequestException ex)
         {
             Logger.LogError(
-                httpRequestException,
-                $"{nameof(TMDBClient.GetMovieDetail)} - an error occurred."
+                ex,
+                "{Operation} - an error occurred.",
+                nameof(TMDBClient.GetMovieDetail)
             );
         }
         finally
@@ -100,18 +90,15 @@ public partial class MovieDetails : IDisposable
 
         try
         {
-            _trailer = await TMDBClient.GetTrailer(MovieId, _cancellationTokenSource.Token);
+            _trailer = await trailerTask;
         }
         catch (OperationCanceledException)
         {
-            Logger.LogDebug($"{nameof(TMDBClient.GetTrailer)} request was cancelled.");
+            Logger.LogDebug("{Operation} request was cancelled.", nameof(TMDBClient.GetTrailer));
         }
-        catch (HttpRequestException httpRequestException)
+        catch (HttpRequestException ex)
         {
-            Logger.LogError(
-                httpRequestException,
-                $"{nameof(TMDBClient.GetTrailer)} - an error occurred."
-            );
+            Logger.LogError(ex, "{Operation} - an error occurred.", nameof(TMDBClient.GetTrailer));
         }
     }
 
@@ -143,6 +130,24 @@ public partial class MovieDetails : IDisposable
             {
                 await jsModule.InvokeVoidAsync("initVideoPlayer", string.Empty);
             }
+        }
+    }
+
+    private void UpdateImageSources()
+    {
+        var newBackdropSrc = GetBackdropUriString(_movieDetailResponse!.BackdropPath);
+        var newPosterSrc = GetPosterUriString(_movieDetailResponse.PosterPath);
+
+        if (!string.Equals(newBackdropSrc, _backdropSrc, StringComparison.Ordinal))
+        {
+            _backdropSrc = newBackdropSrc;
+            _isBackdropLoading = true;
+        }
+
+        if (!string.Equals(newPosterSrc, _posterSrc, StringComparison.Ordinal))
+        {
+            _posterSrc = newPosterSrc;
+            _isPosterLoading = true;
         }
     }
 }
