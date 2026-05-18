@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using NowPlayingApp.Models;
 using NowPlayingApp.Services;
 
@@ -13,6 +14,10 @@ public partial class MovieDetails : IDisposable
     private bool _isPosterLoading = true;
     private MovieDetailResponse? _movieDetailResponse;
     private string _posterSrc = string.Empty;
+    private MovieVideo? _trailer;
+
+    [Inject]
+    public IJSRuntime JsRuntime { get; set; } = null!;
 
     [Inject]
     public ILogger<MovieDetails> Logger { get; set; } = null!;
@@ -45,50 +50,104 @@ public partial class MovieDetails : IDisposable
 
     internal void HandlePosterLoad() => _isPosterLoading = false;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await PlayTrailerAsync();
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         _cancellationTokenSource = new CancellationTokenSource();
+        var token = _cancellationTokenSource.Token;
         _isPageLoading = true;
+
+        var trailerTask = TMDBClient.GetTrailer(MovieId, token);
 
         try
         {
-            _movieDetailResponse = await TMDBClient.GetMovieDetail(MovieId);
-
-            var newBackdropSrc = GetBackdropUriString(_movieDetailResponse.BackdropPath);
-            var newPosterSrc = GetPosterUriString(_movieDetailResponse.PosterPath);
-
-            if (!string.Equals(newBackdropSrc, _backdropSrc, StringComparison.Ordinal))
-            {
-                _backdropSrc = newBackdropSrc;
-                _isBackdropLoading = true;
-            }
-
-            if (!string.Equals(newPosterSrc, _posterSrc, StringComparison.Ordinal))
-            {
-                _posterSrc = newPosterSrc;
-                _isPosterLoading = true;
-            }
+            _movieDetailResponse = await TMDBClient.GetMovieDetail(MovieId, token);
+            UpdateImageSources();
         }
         catch (OperationCanceledException)
         {
-            Logger.LogDebug($"{nameof(TMDBClient.GetMovieDetail)} request was cancelled.");
+            Logger.LogDebug(
+                "{Operation} request was cancelled.",
+                nameof(TMDBClient.GetMovieDetail)
+            );
         }
-        catch (HttpRequestException httpRequestException)
+        catch (HttpRequestException ex)
         {
             Logger.LogError(
-                httpRequestException,
-                $"{nameof(TMDBClient.GetMovieDetail)} - an error occurred."
+                ex,
+                "{Operation} - an error occurred.",
+                nameof(TMDBClient.GetMovieDetail)
             );
         }
         finally
         {
             _isPageLoading = false;
         }
+
+        try
+        {
+            _trailer = await trailerTask;
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.LogDebug("{Operation} request was cancelled.", nameof(TMDBClient.GetTrailer));
+        }
+        catch (HttpRequestException ex)
+        {
+            Logger.LogError(ex, "{Operation} - an error occurred.", nameof(TMDBClient.GetTrailer));
+        }
     }
 
     private string GetBackdropUriString(string backdropPath) =>
         TMDBClient.GetBackdropUri(backdropPath).ToString();
 
+    private string GetModalTitle() => _movieDetailResponse?.Title ?? "Movie trailer";
+
     private string GetPosterUriString(string posterPath) =>
         TMDBClient.GetPosterUri(posterPath).ToString();
+
+    private bool HasTrailer() => _trailer is not null && !string.IsNullOrEmpty(_trailer.Key);
+
+    private async Task PlayTrailerAsync()
+    {
+        var jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./Components/Pages/MovieDetails.razor.js"
+        );
+
+        await using (jsModule)
+        {
+            if (HasTrailer())
+            {
+                var ytTrailerUrl = $"https://www.youtube.com/embed/{_trailer!.Key}";
+                await jsModule.InvokeVoidAsync("initVideoPlayer", ytTrailerUrl);
+            }
+            else
+            {
+                await jsModule.InvokeVoidAsync("initVideoPlayer", string.Empty);
+            }
+        }
+    }
+
+    private void UpdateImageSources()
+    {
+        var newBackdropSrc = GetBackdropUriString(_movieDetailResponse!.BackdropPath);
+        var newPosterSrc = GetPosterUriString(_movieDetailResponse.PosterPath);
+
+        if (!string.Equals(newBackdropSrc, _backdropSrc, StringComparison.Ordinal))
+        {
+            _backdropSrc = newBackdropSrc;
+            _isBackdropLoading = true;
+        }
+
+        if (!string.Equals(newPosterSrc, _posterSrc, StringComparison.Ordinal))
+        {
+            _posterSrc = newPosterSrc;
+            _isPosterLoading = true;
+        }
+    }
 }

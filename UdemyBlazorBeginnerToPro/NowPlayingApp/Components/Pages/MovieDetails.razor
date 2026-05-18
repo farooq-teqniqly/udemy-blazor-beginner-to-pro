@@ -61,6 +61,16 @@
                                     @MovieDetailsFormatter.FormatUserVotesString(_movieDetailResponse.VoteCount) user votes
                                 </span>
                             </div>
+                            @if (HasTrailer())
+                            {
+                                <div id="btn-trailer" class="mt-3">
+                                    <button class="btn btn-outline-warning"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#movie-modal">
+                                        <i class="bi bi-play"></i>Play Trailer
+                                    </button>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -69,3 +79,26 @@
     }
 </div>
 
+<!-- Trailer modal -->
+<div id="movie-modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content modal-background">
+            <div class="modal-header">
+                <h5 id="modal-title" class="modal-title">@(GetModalTitle())</h5>
+                <button type="button" data-bs-dismiss="modal" aria-label="Close" class="ms-auto">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="ratio ratio-16x9">
+                    <iframe id="modal-trailer" src="" allowfullscreen>
+
+                    </iframe>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-warning ms-auto" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
