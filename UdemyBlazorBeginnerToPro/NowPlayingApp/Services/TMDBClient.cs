@@ -110,6 +110,35 @@ namespace NowPlayingApp.Services
         }
 
         /// <summary>
+        /// Retrieves the first official YouTube trailer for a movie, or <see langword="null"/> if none exists.
+        /// </summary>
+        /// <param name="movieId">The TMDB identifier of the movie.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>
+        /// The first official YouTube <see cref="MovieVideo"/> with type Trailer, or <see langword="null"/> if no matching video is found.
+        /// </returns>
+        /// <exception cref="HttpRequestException">
+        /// Thrown if the HTTP request fails or the response cannot be deserialized.
+        /// </exception>
+        public async Task<MovieVideo?> GetTrailer(
+            int movieId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var requestUri = $"movie/{movieId}/videos?language=en-US";
+
+            var allVideos = await GetAsync<MovieVideosResponse>(requestUri, cancellationToken);
+
+            var ytTrailers = allVideos.Results.FirstOrDefault(v =>
+                v.Site.Equals("youtube", StringComparison.OrdinalIgnoreCase)
+                && v.Type.Equals("trailer", StringComparison.OrdinalIgnoreCase)
+                && v.Official
+            );
+
+            return ytTrailers;
+        }
+
+        /// <summary>
         /// Searches for movies matching the specified query string using the TMDB API.
         /// </summary>
         /// <param name="query">The search query string for movie titles.</param>
