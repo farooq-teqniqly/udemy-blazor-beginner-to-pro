@@ -17,10 +17,10 @@ public partial class MovieDetails : IDisposable
     private MovieVideo? _trailer;
 
     [Inject]
-    public ILogger<MovieDetails> Logger { get; set; } = null!;
+    public IJSRuntime JsRuntime { get; set; } = null!;
 
     [Inject]
-    public IJSRuntime JsRuntime { get; set; } = null!;
+    public ILogger<MovieDetails> Logger { get; set; } = null!;
 
     [Parameter]
     public int MovieId { get; set; }
@@ -49,6 +49,11 @@ public partial class MovieDetails : IDisposable
     internal void HandlePosterError() => _isPosterLoading = false;
 
     internal void HandlePosterLoad() => _isPosterLoading = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await PlayTrailerAsync();
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -110,7 +115,17 @@ public partial class MovieDetails : IDisposable
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private string GetBackdropUriString(string backdropPath) =>
+        TMDBClient.GetBackdropUri(backdropPath).ToString();
+
+    private string GetModalTitle() => _movieDetailResponse?.Title ?? "Movie trailer";
+
+    private string GetPosterUriString(string posterPath) =>
+        TMDBClient.GetPosterUri(posterPath).ToString();
+
+    private bool HasTrailer() => _trailer is not null && !string.IsNullOrEmpty(_trailer.Key);
+
+    private async Task PlayTrailerAsync()
     {
         var jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
@@ -130,14 +145,4 @@ public partial class MovieDetails : IDisposable
             }
         }
     }
-
-    private string GetBackdropUriString(string backdropPath) =>
-        TMDBClient.GetBackdropUri(backdropPath).ToString();
-
-    private string GetModalTitle() => _movieDetailResponse?.Title ?? "Movie trailer";
-
-    private string GetPosterUriString(string posterPath) =>
-        TMDBClient.GetPosterUri(posterPath).ToString();
-
-    private bool HasTrailer() => _trailer is not null && !string.IsNullOrEmpty(_trailer.Key);
 }
