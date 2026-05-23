@@ -65,48 +65,23 @@ public partial class MovieDetails : IDisposable
         var trailerTask = TMDBClient.GetTrailer(MovieId, token);
         var creditsTask = TMDBClient.GetCredits(MovieId, token);
 
-        try
-        {
-            _movieDetailResponse = await TMDBClient.GetMovieDetail(MovieId, token);
+        _movieDetailResponse = await ExecuteApiCallAsync(
+            nameof(TMDBClient.GetMovieDetail),
+            TMDBClient.GetMovieDetail(MovieId, token)
+        );
+
+        if (_movieDetailResponse is not null)
             UpdateImageSources();
-        }
-        catch (OperationCanceledException)
-        {
-            Logger.LogDebug(
-                "{Operation} request was cancelled.",
-                nameof(TMDBClient.GetMovieDetail)
-            );
-        }
-        catch (HttpRequestException ex)
-        {
-            Logger.LogError(
-                ex,
-                "{Operation} - an error occurred.",
-                nameof(TMDBClient.GetMovieDetail)
-            );
-        }
-        finally
-        {
-            _isPageLoading = false;
-        }
 
-        try
-        {
-            _trailer = await trailerTask;
-        }
-        catch (OperationCanceledException)
-        {
-            Logger.LogDebug("{Operation} request was cancelled.", nameof(TMDBClient.GetTrailer));
-        }
-        catch (HttpRequestException ex)
-        {
-            Logger.LogError(ex, "{Operation} - an error occurred.", nameof(TMDBClient.GetTrailer));
-        }
+        _isPageLoading = false;
 
-        try
+        _trailer = await ExecuteApiCallAsync(nameof(TMDBClient.GetTrailer), trailerTask);
+
+        var credits = await ExecuteApiCallAsync(nameof(TMDBClient.GetCredits), creditsTask);
+
+        if (credits is not null)
         {
-            var credits = await creditsTask;
-            _cast = credits.Cast.OrderBy(c => c.Order).ToList();
+            _cast = [.. credits.Cast.OrderBy(c => c.Order)];
 
             Logger.LogDebug(
                 "{Operation} - retrieved {CastMemberCount} cast members.",
@@ -114,18 +89,27 @@ public partial class MovieDetails : IDisposable
                 _cast.Count
             );
 
-            foreach (var castMember in credits.Cast)
-            {
+            foreach (var castMember in _cast)
                 castMember.ProfilePath = GetProfileUriString(castMember.ProfilePath);
-            }
+        }
+    }
+
+    private async Task<T?> ExecuteApiCallAsync<T>(string operationName, Task<T> apiTask)
+        where T : class?
+    {
+        try
+        {
+            return await apiTask;
         }
         catch (OperationCanceledException)
         {
-            Logger.LogDebug("{Operation} request was cancelled.", nameof(TMDBClient.GetCredits));
+            Logger.LogDebug("{Operation} request was cancelled.", operationName);
+            return null;
         }
         catch (HttpRequestException ex)
         {
-            Logger.LogError(ex, "{Operation} - an error occurred.", nameof(TMDBClient.GetCredits));
+            Logger.LogError(ex, "{Operation} - an error occurred.", operationName);
+            return null;
         }
     }
 
