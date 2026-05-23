@@ -8,11 +8,16 @@
     });
 }
 
+function getContext(container) {
+    return {
+        btnWidth: container.querySelector(".nav-btn-prev").getBoundingClientRect().right,
+        contentArea: container.querySelector(".swiper-content"),
+        items: container.querySelectorAll(".swiper-content .swiper-item"),
+    };
+}
+
 function gotoNext(container) {
-    const btn = container.querySelector(".nav-btn-prev");
-    const btnWidth = btn.getBoundingClientRect().right;
-    const contentArea = container.querySelector(".swiper-content");
-    const items = contentArea.querySelectorAll(".swiper-item");
+    const { btnWidth, contentArea, items } = getContext(container);
 
     for (let i = 0; i < items.length; i++) {
         const start = Math.floor(items[i].getBoundingClientRect().left);
@@ -25,10 +30,7 @@ function gotoNext(container) {
 }
 
 function gotoPrevious(container) {
-    const btn = container.querySelector(".nav-btn-prev");
-    const btnWidth = btn.getBoundingClientRect().right;
-    const contentArea = container.querySelector(".swiper-content");
-    const items = contentArea.querySelectorAll(".swiper-item");
+    const { btnWidth, contentArea, items } = getContext(container);
 
     for (let i = items.length - 1; i >= 0; i--) {
         const start = Math.ceil(items[i].getBoundingClientRect().left);
