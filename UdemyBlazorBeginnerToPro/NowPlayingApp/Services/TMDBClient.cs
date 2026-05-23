@@ -54,6 +54,21 @@ namespace NowPlayingApp.Services
         }
 
         /// <summary>
+        /// Retrieves the cast and crew credits for the specified movie from TMDB.
+        /// </summary>
+        /// <param name="movieId">The TMDB movie identifier.</param>
+        /// <param name="cancellationToken">Token to cancel the operation.</param>
+        /// <returns>A <see cref="MovieCreditsResponse"/> containing the cast and crew for the movie.</returns>
+        public async Task<MovieCreditsResponse> GetCredits(
+            int movieId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var requestUri = $"movie/{movieId}/credits?language=en-US";
+            return await GetAsync<MovieCreditsResponse>(requestUri, cancellationToken);
+        }
+
+        /// <summary>
         /// Retrieves detailed information about a specific movie from TMDB.
         /// </summary>
         /// <param name="movieId">The unique identifier of the movie.</param>
@@ -107,6 +122,16 @@ namespace NowPlayingApp.Services
         public Uri GetPosterUri(string posterPath)
         {
             return GetImageUri(posterPath, "poster.png");
+        }
+
+        /// <summary>
+        /// Builds a profile image URI for a TMDB profile image path or returns the local fallback profile image.
+        /// </summary>
+        /// <param name="profilePath">Profile image path returned by TMDB.</param>
+        /// <returns>An absolute TMDB image URI or a relative fallback URI.</returns>
+        public Uri GetProfileUri(string? profilePath)
+        {
+            return GetImageUri(profilePath, "profile.jpg");
         }
 
         /// <summary>
@@ -190,7 +215,7 @@ namespace NowPlayingApp.Services
             return responseModel;
         }
 
-        private Uri GetImageUri(string imagePath, string fallbackImagePath)
+        private Uri GetImageUri(string? imagePath, string fallbackImagePath)
         {
             ArgumentException.ThrowIfNullOrEmpty(fallbackImagePath);
             ArgumentException.ThrowIfNullOrEmpty(_settings.TMDBImageBaseAddress);

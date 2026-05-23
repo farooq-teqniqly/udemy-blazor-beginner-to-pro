@@ -9,6 +9,7 @@ public partial class MovieDetails : IDisposable
 {
     private string _backdropSrc = string.Empty;
     private CancellationTokenSource? _cancellationTokenSource;
+    private List<MovieCastMember> _cast = [];
     private bool _isBackdropLoading = true;
     private bool _isPageLoading;
     private bool _isPosterLoading = true;
@@ -62,6 +63,7 @@ public partial class MovieDetails : IDisposable
         _isPageLoading = true;
 
         var trailerTask = TMDBClient.GetTrailer(MovieId, token);
+        var creditsTask = TMDBClient.GetCredits(MovieId, token);
 
         try
         {
@@ -100,6 +102,31 @@ public partial class MovieDetails : IDisposable
         {
             Logger.LogError(ex, "{Operation} - an error occurred.", nameof(TMDBClient.GetTrailer));
         }
+
+        try
+        {
+            var credits = await creditsTask;
+            _cast = credits.Cast.OrderBy(c => c.Order).ToList();
+
+            Logger.LogDebug(
+                "{Operation} - retrieved {CastMemberCount} cast members.",
+                nameof(TMDBClient.GetCredits),
+                _cast.Count
+            );
+
+            foreach (var castMember in credits.Cast)
+            {
+                castMember.ProfilePath = GetProfileUriString(castMember.ProfilePath);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.LogDebug("{Operation} request was cancelled.", nameof(TMDBClient.GetCredits));
+        }
+        catch (HttpRequestException ex)
+        {
+            Logger.LogError(ex, "{Operation} - an error occurred.", nameof(TMDBClient.GetCredits));
+        }
     }
 
     private string GetBackdropUriString(string backdropPath) =>
@@ -109,6 +136,9 @@ public partial class MovieDetails : IDisposable
 
     private string GetPosterUriString(string posterPath) =>
         TMDBClient.GetPosterUri(posterPath).ToString();
+
+    private string GetProfileUriString(string? profilePath) =>
+        TMDBClient.GetProfileUri(profilePath).ToString();
 
     private bool HasTrailer() => _trailer is not null && !string.IsNullOrEmpty(_trailer.Key);
 

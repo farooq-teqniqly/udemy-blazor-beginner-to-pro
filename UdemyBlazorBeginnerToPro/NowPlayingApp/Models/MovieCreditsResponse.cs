@@ -11,13 +11,13 @@ public class MovieCreditsResponse
     /// Gets or sets the cast members credited in the movie.
     /// </summary>
     [JsonPropertyName("cast")]
-    public MovieCastMember[] Cast { get; set; } = [];
+    public List<MovieCastMember> Cast { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the crew members credited in the movie.
     /// </summary>
     [JsonPropertyName("crew")]
-    public MovieCrewMember[] Crew { get; set; } = [];
+    public List<MovieCrewMember> Crew { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the TMDB movie identifier.
