@@ -1,0 +1,40 @@
+﻿@inject IJSRuntime JsRuntime
+
+<div class="swiper-container" @ref="_container">
+    <button class="nav-btn-prev d-none d-sm-block">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    <div class="d-flex flex-grow-1 align-items-center overflow-x-auto swiper-content">
+        @foreach(var castMember in Cast)
+        {
+            <ActorSwiperItem CastMember="castMember"></ActorSwiperItem>
+        }
+    </div>
+    <button class="nav-btn-next d-none d-sm-block">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+</div>
+
+@code {
+    [Parameter, EditorRequired] 
+    public List<MovieCastMember?> Cast { get; set; } = [];
+
+    private ElementReference _container;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./Components/UI/ActorSwiper/ActorSwiper.razor.js"
+            );
+
+            await using (jsModule)
+            {
+                await jsModule.InvokeVoidAsync("init", _container);
+            }
+        }
+    }
+
+}

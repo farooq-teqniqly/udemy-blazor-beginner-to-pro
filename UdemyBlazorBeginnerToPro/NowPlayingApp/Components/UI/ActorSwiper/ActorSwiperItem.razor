@@ -1,0 +1,15 @@
+﻿@if (CastMember is not null)
+{
+    <div class="hstack gap-3 align-items-center px-2 swiper-item">
+        <img src="@CastMember.ProfilePath" class="actor-img"/>
+        <div>
+            <div class="fw-bold text-nowrap">@CastMember.Name</div>
+            <div class="text-muted text-nowrap">@CastMember.Character</div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] 
+    public MovieCastMember? CastMember { get; set; }
+}
