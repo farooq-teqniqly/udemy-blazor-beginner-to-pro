@@ -37,13 +37,25 @@ namespace NowPlayingApp
                         var settings = sp.GetRequiredService<IOptions<TMDBClientSettings>>();
                         ValidateSettings(settings.Value);
 
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                            "Bearer",
-                            settings.Value.TMDBAccessKey
-                        );
+                        // When deployed behind a proxy (e.g. Netlify edge function), the proxy
+                        // injects the Authorization header server-side, so no key is needed here.
+                        // In local development the key comes from user secrets.
+                        if (!string.IsNullOrEmpty(settings.Value.TMDBAccessKey))
+                        {
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                                "Bearer",
+                                settings.Value.TMDBAccessKey
+                            );
+                        }
 
                         client.DefaultRequestHeaders.Add("Accept", "application/json");
-                        client.BaseAddress = new Uri(settings.Value.TMDBApiBaseAddress!);
+
+                        // A relative address (e.g. "tmdb/") means requests are routed through the
+                        // host-origin proxy. An absolute address targets the TMDB API directly.
+                        var apiBase = settings.Value.TMDBApiBaseAddress!;
+                        client.BaseAddress = Uri.IsWellFormedUriString(apiBase, UriKind.Absolute)
+                            ? new Uri(apiBase)
+                            : new Uri(new Uri(builder.HostEnvironment.BaseAddress), apiBase);
                     }
                 )
                 .AddStandardResilienceHandler();
@@ -57,7 +69,6 @@ namespace NowPlayingApp
         private static void ValidateSettings(TMDBClientSettings settings)
         {
             ArgumentException.ThrowIfNullOrEmpty(settings.TMDBImageBaseAddress);
-            ArgumentException.ThrowIfNullOrEmpty(settings.TMDBAccessKey);
             ArgumentException.ThrowIfNullOrEmpty(settings.TMDBApiBaseAddress);
         }
     }
