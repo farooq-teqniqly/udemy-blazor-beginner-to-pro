@@ -1,0 +1,16 @@
+meta {
+  name: Get Items
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{API_URL}}/api/taskeritems
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
