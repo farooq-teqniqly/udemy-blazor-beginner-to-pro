@@ -1,3 +1,0 @@
-# allows client-side routing in WASM
-/tmdb/*	/tmdb/*
-/*	/	200
