@@ -18,5 +18,5 @@
 };
 
 export const config = {
-    path: "tmdb/*"
+    path: "/tmdb/*"
 }
