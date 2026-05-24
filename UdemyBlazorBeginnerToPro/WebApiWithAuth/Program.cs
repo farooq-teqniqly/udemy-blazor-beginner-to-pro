@@ -1,3 +1,6 @@
+using System.CodeDom;
+using Microsoft.EntityFrameworkCore;
+using WebApiWithAuth.Data;
 
 namespace WebApiWithAuth
 {
@@ -13,6 +16,18 @@ namespace WebApiWithAuth
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            // Add database
+            builder.Services.AddDbContext<ApplicationDbContext>(opts =>
+            {
+                var connectionString =
+                    builder.Configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new InvalidOperationException(
+                        "Connection string 'DefaultConnection' not configured."
+                    );
+
+                opts.UseNpgsql(connectionString);
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -24,7 +39,6 @@ namespace WebApiWithAuth
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
