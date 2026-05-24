@@ -6,7 +6,7 @@
         tmdbUrl += "/";
     }
 
-    const url = new Url(req.url);
+    const url = new URL(req.url);
     const tmdbPath = url.pathname.replace("/tmdb/", "");
 
     return await fetch(tmdbUrl + tmdbPath + url.search,
