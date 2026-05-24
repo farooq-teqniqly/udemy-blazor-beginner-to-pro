@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApiWithAuth.Data;
 
@@ -27,7 +28,24 @@ namespace WebApiWithAuth
                 opts.UseNpgsql(connectionString);
             });
 
+            // Add auth
+            builder.Services.AddAuthorization();
+
+            builder
+                .Services.AddIdentityApiEndpoints<IdentityUser>(opts =>
+                    opts.SignIn.RequireConfirmedAccount = false
+                )
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            builder.Services.AddCors(opts =>
+                opts.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin())
+            );
+
             var app = builder.Build();
+
+            app.UseCors();
+            app.MapIdentityApi<IdentityUser>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

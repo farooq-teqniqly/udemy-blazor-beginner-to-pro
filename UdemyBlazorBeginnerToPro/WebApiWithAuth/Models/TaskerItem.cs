@@ -3,6 +3,33 @@ using Microsoft.AspNetCore.Identity;
 
 namespace WebApiWithAuth.Models
 {
+    public static class TaskerItemExtensions
+    {
+        public static TaskerItem ToModel(this TaskerItemDto dto)
+        {
+            ArgumentNullException.ThrowIfNull(dto);
+
+            return new TaskerItem
+            {
+                Completed = dto.Completed,
+                Id = dto.Id,
+                Name = dto.Name,
+            };
+        }
+
+        public static TaskerItemDto ToDto(this TaskerItem taskerItem)
+        {
+            ArgumentNullException.ThrowIfNull(taskerItem);
+
+            return new TaskerItemDto
+            {
+                Completed = taskerItem.Completed,
+                Id = taskerItem.Id,
+                Name = taskerItem.Name,
+            };
+        }
+    }
+
     public class TaskerItem
     {
         public bool Completed { get; set; } = false;
