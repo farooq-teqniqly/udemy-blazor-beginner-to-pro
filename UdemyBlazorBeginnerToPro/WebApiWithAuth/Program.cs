@@ -26,6 +26,11 @@ namespace WebApiWithAuth
                     );
 
                 opts.UseNpgsql(connectionString);
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    opts.EnableSensitiveDataLogging().EnableDetailedErrors();
+                }
             });
 
             // Add auth
