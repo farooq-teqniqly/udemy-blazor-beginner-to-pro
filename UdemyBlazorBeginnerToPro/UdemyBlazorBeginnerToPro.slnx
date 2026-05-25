@@ -14,6 +14,10 @@
   <Folder Name="/WebApiWithAuth/">
     <Project Path="WebApiWithAuth/WebApiWithAuth.csproj" Id="148b5157-1efe-4d23-b650-4f6f67048636" />
   </Folder>
+  <Folder Name="/WebAppWithBrandingAuth/">
+    <Project Path="WebAppWithBrandingAuth/WebAppWithBrandingAuth.Client/WebAppWithBrandingAuth.Client.csproj" Id="a0bf4a5b-a5b8-4b3d-9efc-de8c18cf1809" />
+    <Project Path="WebAppWithBrandingAuth/WebAppWithBrandingAuth/WebAppWithBrandingAuth.csproj" Id="29ff54f4-9d95-4397-886a-2aceb0479727" />
+  </Folder>
   <Project Path="BlazorLayout/BlazorLayout.csproj" Id="b7b357cb-a172-4bba-bd50-3f784952302d" />
   <Project Path="Tasker/Tasker.csproj" Id="44477356-7737-42fe-95ff-ac882fe22ae9" />
 </Solution>
