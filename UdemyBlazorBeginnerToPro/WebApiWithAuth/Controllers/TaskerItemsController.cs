@@ -33,9 +33,7 @@ namespace WebApiWithAuth.Controllers
         public async Task<ActionResult<IEnumerable<TaskerItemDto>>> GetTaskerItems()
         {
             return await _context
-                .TaskerItems.Where(ti =>
-                    ti.UserId.Equals(_userId, StringComparison.OrdinalIgnoreCase)
-                )
+                .TaskerItems.Where(ti => ti.UserId.Equals(_userId))
                 .Select(ti => ti.ToDto())
                 .ToListAsync();
         }
@@ -45,7 +43,7 @@ namespace WebApiWithAuth.Controllers
         public async Task<ActionResult<TaskerItemDto>> GetTaskerItem(int id)
         {
             var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti =>
-                ti.UserId.Equals(_userId, StringComparison.OrdinalIgnoreCase)
+                ti.UserId.Equals(_userId)
             );
 
             if (taskerItem == null)
@@ -67,7 +65,7 @@ namespace WebApiWithAuth.Controllers
             }
 
             var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti =>
-                ti.UserId.Equals(_userId, StringComparison.OrdinalIgnoreCase) && ti.Id == id
+                ti.UserId.Equals(_userId) && ti.Id == id
             );
 
             if (taskerItem == null)
@@ -112,6 +110,8 @@ namespace WebApiWithAuth.Controllers
             _context.TaskerItems.Add(taskerItem);
             await _context.SaveChangesAsync();
 
+            dto = taskerItem.ToDto();
+
             return CreatedAtAction("GetTaskerItem", new { id = dto.Id }, dto);
         }
 
@@ -120,7 +120,7 @@ namespace WebApiWithAuth.Controllers
         public async Task<IActionResult> DeleteTaskerItem(int id)
         {
             var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti =>
-                ti.UserId.Equals(_userId, StringComparison.OrdinalIgnoreCase) && ti.Id == id
+                ti.UserId.Equals(_userId) && ti.Id == id
             );
 
             if (taskerItem == null)
