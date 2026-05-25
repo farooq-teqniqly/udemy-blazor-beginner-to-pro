@@ -14,7 +14,6 @@ namespace WebApiWithAuth.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
-        private string? _userId => _userManager.GetUserId(User);
 
         public TaskerItemsController(
             ApplicationDbContext context,
@@ -28,23 +27,30 @@ namespace WebApiWithAuth.Controllers
             _userManager = userManager;
         }
 
-        // GET: api/TaskerItems
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TaskerItemDto>>> GetTaskerItems()
+        private string? _userId => _userManager.GetUserId(User);
+
+        // DELETE: api/TaskerItems/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTaskerItem(int id)
         {
-            return await _context
-                .TaskerItems.Where(ti => ti.UserId.Equals(_userId))
-                .Select(ti => ti.ToDto())
-                .ToListAsync();
+            var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti => ti.Id == id);
+
+            if (taskerItem == null)
+            {
+                return NotFound();
+            }
+
+            _context.TaskerItems.Remove(taskerItem);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         // GET: api/TaskerItems/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TaskerItemDto>> GetTaskerItem(int id)
         {
-            var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti =>
-                ti.UserId.Equals(_userId)
-            );
+            var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti => ti.Id == id);
 
             if (taskerItem == null)
             {
@@ -54,44 +60,11 @@ namespace WebApiWithAuth.Controllers
             return taskerItem.ToDto();
         }
 
-        // PUT: api/TaskerItems/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTaskerItem(int id, TaskerItemDto dto)
+        // GET: api/TaskerItems
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TaskerItemDto>>> GetTaskerItems()
         {
-            if (id != dto.Id)
-            {
-                return BadRequest();
-            }
-
-            var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti =>
-                ti.UserId.Equals(_userId) && ti.Id == id
-            );
-
-            if (taskerItem == null)
-            {
-                return NotFound();
-            }
-
-            taskerItem.Name = dto.Name;
-            taskerItem.Completed = dto.Completed;
-            _context.Entry(taskerItem).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TaskerItemExists(id))
-                {
-                    return NotFound();
-                }
-
-                throw;
-            }
-
-            return NoContent();
+            return await _context.TaskerItems.Select(ti => ti.ToDto()).ToListAsync();
         }
 
         // POST: api/TaskerItems
@@ -115,21 +88,40 @@ namespace WebApiWithAuth.Controllers
             return CreatedAtAction("GetTaskerItem", new { id = dto.Id }, dto);
         }
 
-        // DELETE: api/TaskerItems/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTaskerItem(int id)
+        // PUT: api/TaskerItems/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTaskerItem(int id, TaskerItemDto dto)
         {
-            var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti =>
-                ti.UserId.Equals(_userId) && ti.Id == id
-            );
+            if (id != dto.Id)
+            {
+                return BadRequest();
+            }
+
+            var taskerItem = await _context.TaskerItems.FirstOrDefaultAsync(ti => ti.Id == id);
 
             if (taskerItem == null)
             {
                 return NotFound();
             }
 
-            _context.TaskerItems.Remove(taskerItem);
-            await _context.SaveChangesAsync();
+            taskerItem.Name = dto.Name;
+            taskerItem.Completed = dto.Completed;
+            _context.Entry(taskerItem).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TaskerItemExists(id))
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
 
             return NoContent();
         }
