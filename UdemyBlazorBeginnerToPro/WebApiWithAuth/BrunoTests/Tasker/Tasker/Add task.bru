@@ -1,0 +1,36 @@
+meta {
+  name: Add task
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{API_URL}}/api/taskeritems
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "{{TASK_NAME}}"
+  }
+}
+
+assert {
+  res.body.completed: eq false
+  res.body.name: eq {{TASK_NAME}}
+  res.body.id: gte 1
+  res.status: eq 201
+}
+
+script:pre-request {
+  const taskNames = ["Wash dishes", "Write code", "Exercise", "Read a book", "Buy groceries"];
+  const index = Math.floor(Math.random() * taskNames.length);
+  
+  bru.setVar("TASK_NAME", taskNames[index]);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

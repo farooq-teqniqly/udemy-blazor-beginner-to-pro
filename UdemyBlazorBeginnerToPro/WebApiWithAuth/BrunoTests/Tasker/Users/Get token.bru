@@ -1,20 +1,31 @@
 meta {
-  name: Register user
+  name: Get token
   type: http
-  seq: 1
+  seq: 2
 }
 
 post {
-  url: {{API_URL}}/register
+  url: {{API_URL}}/login?useCookies=false
   body: json
   auth: inherit
 }
 
+params:query {
+  useCookies: false
+}
+
 body:json {
   {
-    "email": "{{email}}",
+    "email": "FBdyMDVyiB@example.com",
     "password": "{{password}}"
   }
+}
+
+assert {
+  res.body.tokenType: eq Bearer
+  res.body.accessToken: isNotEmpty
+  res.body.expiresIn: eq 3600
+  res.body.refreshToken: isNotEmpty
 }
 
 script:pre-request {
@@ -30,7 +41,10 @@ script:pre-request {
   email += "@" + domain;
   
   bru.setVar("email", email);
-  bru.setVar("password", "Pass1234!");
+}
+
+script:post-response {
+  bru.setVar("TOKEN", res.body.accessToken);
 }
 
 settings {

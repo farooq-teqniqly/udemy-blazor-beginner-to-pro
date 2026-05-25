@@ -1,5 +1,5 @@
 meta {
-  name: Get Items
+  name: Get tasks
   type: http
   seq: 2
 }
@@ -8,6 +8,11 @@ get {
   url: {{API_URL}}/api/taskeritems
   body: none
   auth: inherit
+}
+
+assert {
+  res.body.length: gte 1
+  res.status: eq 200
 }
 
 settings {
