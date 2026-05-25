@@ -1,0 +1,38 @@
+meta {
+  name: Register user
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{API_URL}}/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "password": "Pass1234!"
+  }
+}
+
+script:pre-request {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let email = "";
+  let domain = "example.com";
+  let emailLength = 10;
+  
+  for (let i = 0; i < emailLength; i++) {
+    email += characters.charAt(Math.floor(Math.random() * characters.length)); 
+  }
+  
+  email += "@" + domain;
+  
+  bru.setVar("email", email);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
