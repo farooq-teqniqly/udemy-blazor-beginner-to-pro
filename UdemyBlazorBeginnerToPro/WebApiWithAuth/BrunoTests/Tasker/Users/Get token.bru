@@ -1,0 +1,53 @@
+meta {
+  name: Get token
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{API_URL}}/login?useCookies=false
+  body: json
+  auth: inherit
+}
+
+params:query {
+  useCookies: false
+}
+
+body:json {
+  {
+    "email": "FBdyMDVyiB@example.com",
+    "password": "{{password}}"
+  }
+}
+
+assert {
+  res.body.tokenType: eq Bearer
+  res.body.accessToken: isNotEmpty
+  res.body.expiresIn: eq 3600
+  res.body.refreshToken: isNotEmpty
+}
+
+script:pre-request {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let email = "";
+  let domain = "example.com";
+  let emailLength = 10;
+  
+  for (let i = 0; i < emailLength; i++) {
+    email += characters.charAt(Math.floor(Math.random() * characters.length)); 
+  }
+  
+  email += "@" + domain;
+  
+  bru.setVar("email", email);
+}
+
+script:post-response {
+  bru.setVar("TOKEN", res.body.accessToken);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
